@@ -1,0 +1,8 @@
+{
+    "deno.enablePaths": ["scripts/deno"],
+    "editor.detectIndentation": true,
+    "[json][jsonc][json5][javascript][javascriptreact][typescript][typescriptreact][yaml]": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "denoland.vscode-deno"
+    }
+}
