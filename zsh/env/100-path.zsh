@@ -19,7 +19,7 @@ path=(
     "$PNPM_HOME"
     "/opt/local/bin"
     "/opt/local/sbin"
+    $path
     "$HOME/.micromamba/bin"
     "$HOME/micromamba/bin"
-    $path
 )
