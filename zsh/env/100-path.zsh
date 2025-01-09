@@ -23,3 +23,6 @@ path=(
     "$HOME/.micromamba/bin"
     "$HOME/micromamba/bin"
 )
+
+# github copilot chat adds a space to the path and breaks some stuff
+path=( ${path[@]:#*copilot-chat/debugCommand*} )
