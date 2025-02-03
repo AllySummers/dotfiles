@@ -23,12 +23,11 @@ function fzf_alias_search() {
     done
 
     # local selection
-    selection=$(
+    local selection=$(
         echo -e "$alias_list" \
             | column -t -s $'\t' \
             | fzf --ansi --prompt "Select Alias> " --tac --no-sort
     )
-    # echo "$selection"
 
     if [[ -n $selection ]]; then
         # Extract the alias name from the selection
