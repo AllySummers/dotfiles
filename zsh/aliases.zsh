@@ -88,7 +88,8 @@ alias ptsc='node_modules/.bin/tsc '
 alias pesbuild='node -r esbuild-register '
 alias pesb='pesbuild '
 alias peslint='node_modules/.bin/eslint '
-alias flatpeslint='ESLINT_USE_FLAT_CONFIG=true node_modules/.bin/eslint -c eslint.flat-config.js '
 alias pvitest='node_modules/.bin/vitest '
 
 alias -s git="git clone"
+alias fzfo="code-insiders $(fzf)"
+
