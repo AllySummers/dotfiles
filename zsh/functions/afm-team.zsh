@@ -5,9 +5,9 @@
 # Example: afm-team 'JFP - Bedrock'
 #############################################
 
-Color_Off='\033[0m'       # Text Reset
-IPurple='\033[0;95m'      # Purple
-BICyan='\033[1;96m'       # Cyan
+clr_off='\033[0m'       # Text Reset
+clr_purple='\033[0;95m'      # Purple
+clr_cyan='\033[1;96m'       # Cyan
 
 afm-team() {
   if ! command -v jq >/dev/null 2>&1; then
@@ -28,8 +28,8 @@ afm-team() {
   local slack="$(jq -r '.["'"$team"'"].slack' teams.json)"
   slack="${slack#\#}"
 
-  echo -e "${BICyan}Team: ${Color_Off}${team}"
-  echo -e "${IPurple}Slack: ${Color_Off}https://${SLACK_DOMAIN}/channels/${slack} (#${slack})"
+  echo -e "${clr_cyan}Team: ${clr_off}${team}"
+  echo -e "${clr_purple}Slack: ${clr_off}https://${SLACK_DOMAIN}/channels/${slack} (#${slack})"
 }
 
 _afm_team() {

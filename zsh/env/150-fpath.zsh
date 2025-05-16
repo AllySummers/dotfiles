@@ -35,4 +35,5 @@ fpath=(
     "$OMZ_PATH/plugins/httpie"
     "$OMZ_PATH/plugins/ripgrep"
     "$ANTIDOTE_HOME/z-shell/H-S-MW"
+    "$HOME/.bun"
 )

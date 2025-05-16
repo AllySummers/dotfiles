@@ -14,6 +14,7 @@ export DENO_INSTALL="$HOME/.deno"
 # █▄█ ▀▄█ █ ▀█
 
 export PNPM_HOME="$HOME/Library/pnpm"
+export BUN_INSTALL="$HOME/.bun"
 
 
 # █▀ █▄ █ █▄ ▄█
@@ -59,3 +60,7 @@ export PYENV_ROOT="${PYENV_ROOT:=${HOME}/.pyenv}"
 # ▀▄▀ ▀▄▄ █▀  █ █ ▀▄█
 
 export VCPKG_ROOT="$HOME/c-packages/vcpkg"
+
+# ---
+
+export SPICETIFY_INSTALL="$HOME/.spicetify"

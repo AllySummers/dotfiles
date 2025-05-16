@@ -68,6 +68,6 @@ function yarn-fzf() {
     --with-nth=1 \
     --preview 'bat --color=always {3}/package.json' \
     --preview-window 'right:30%' \
-    --bind 'enter:execute(${VISUAL:-${EDITOR:-nano}} {3}/package.json)+abort'
+    --bind 'enter:execute(${VISUAL:-${EDITOR:-nano}} $(grealpath --relative-to=. {3}/package.json))+abort'
 }
 

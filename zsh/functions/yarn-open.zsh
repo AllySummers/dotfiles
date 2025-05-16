@@ -29,8 +29,10 @@ yarn-open() {
     return 1
   fi
 
+  pkg_realpath="$(realpath "$selected_pkg/package.json")"
+
   if [[ -d "$selected_pkg" ]]; then
-    ${VISUAL:-${EDITOR:-vim}} "$selected_pkg/package.json"
+    ${VISUAL:-${EDITOR:-vim}} "$pkg_realpath"
   else
     echo "Error: package.json for package '$package' not found." >&2
     return 1

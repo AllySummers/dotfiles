@@ -6,6 +6,7 @@ path=(
     "$HOME/.ts-cli/bin"
     "$BUN_INSTALL/bin"
     "$HOME/.local/bin"
+    "$AFM_DIR/afm-tools/path"
     # Jenv Shims
     "$JENV_ROOT/shims"
     # Pyenv Shims
@@ -22,6 +23,8 @@ path=(
     $path
     "$HOME/.micromamba/bin"
     "$HOME/micromamba/bin"
+    "$HOME/.orbit/bin"
+    "$BUN_INSTALL/bin"
 )
 
 # github copilot chat adds a space to the path and breaks some stuff

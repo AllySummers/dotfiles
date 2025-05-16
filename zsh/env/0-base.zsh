@@ -23,3 +23,9 @@ export ZSH_CACHE_DIR="$ZSH_HOME/cache"
 export HISTFILE="$ZSH_HOME/zsh_history"
 export HISTSIZE=10000000
 export SAVEHIST="$HISTSIZE"
+
+# https://gist.github.com/bulletinmybeard/8a3ad86c0a31fb7b3e55d659b7a6f446
+# gets rid of annoying %
+export PROMPT_CR
+export PROMPT_SP
+export PROMPT_EOL_MARK=''

@@ -1,10 +1,7 @@
 alias zsh-bundle='antidote bundle <~/.zsh_plugins.txt >~/.zsh_plugins.zsh'
 
-if [[ "$VISUAL" == "code-insiders" ]]; then
-  alias edit="code-insiders "
-else
-  alias edit="hx "
-fi
+alias edit='${VISUAL:-${EDITOR:-nano}} '
+alias e='edit '
 
 alias nvm='fnm '
 
@@ -91,5 +88,10 @@ alias peslint='node_modules/.bin/eslint '
 alias pvitest='node_modules/.bin/vitest '
 
 alias -s git="git clone"
-alias fzfo="code-insiders $(fzf)"
 
+alias jsonl2json="jq --slurp '.'"
+alias ndjson2json="jq --slurp '.'"
+
+alias timestamp='printf "%.4f" "$(echo "$(gdate +%s.%N) * 1000" | bc -l)"'
+
+alias fixup='git log -n 10 --oneline --no-decorate --no-merges | fzf -0 --preview "git show --color=always --format=oneline {1}" | awk "{print $1}" | xargs -r git commit --fixup'
