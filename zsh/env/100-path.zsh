@@ -6,7 +6,6 @@ path=(
     "$HOME/.ts-cli/bin"
     # "$BUN_INSTALL/bin"
     "$HOME/.local/bin"
-    "$AFM_DIR/bin"
     # Jenv Shims
     # "$JENV_ROOT/shims"
     # Pyenv Shims

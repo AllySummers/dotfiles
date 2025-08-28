@@ -62,8 +62,6 @@ alias gunignore='git update-index --no-skip-worktree '
 
 # git pull master
 alias gp-m='git pull origin master'
-# git pull jira-stable
-alias gp-js='git pull origin jira-stable'
 # git pull head
 alias gp='git pull origin '
 alias gp-h='git pull origin $(git rev-parse --abbrev-ref HEAD) '
