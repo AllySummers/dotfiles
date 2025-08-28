@@ -18,9 +18,12 @@ function yarn-fzf() {
   preview_cols=$(( t_cols * 30 / 100 ))
   main_cols=$(( t_cols - preview_cols ))
   name_width=$(( main_cols * 40 / 100 ))
+  local yarnlock=$(find-up yarn.lock)
+  yarnlock_dir=$(dirname "$yarnlock")
+  abs_dir=$(realpath "$yarnlock_dir")
 
   rg 'resolution:\s*"(.*?)@workspace.*:(.*?)"' \
-  -Nor $'$1\t$2' yarn.lock \
+  -Nor $'$1\t$2' "$yarnlock" \
   | awk -F'\t' -v nW="$name_width" '
     ##################################################################
     # Left-align, truncate if too long, else pad with spaces (right)
@@ -66,8 +69,9 @@ function yarn-fzf() {
     --border \
     --delimiter='\t' \
     --with-nth=1 \
-    --preview 'bat --color=always {3}/package.json' \
+    --preview "bat --color=always --file-name='{3}/package.json' '$abs_dir/{3}/package.json'" \
     --preview-window 'right:30%' \
-    --bind 'enter:execute(${VISUAL:-${EDITOR:-nano}} $(grealpath --relative-to=. {3}/package.json))+abort'
+    --bind "enter:execute($VISUAL '$abs_dir/{3}/package.json')+abort"
+
 }
 

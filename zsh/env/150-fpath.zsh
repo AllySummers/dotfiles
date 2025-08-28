@@ -1,11 +1,19 @@
+# fpath+=( $OMZ_PATH/plugins/git )
+# fpath+=( $OMZ_PATH/plugins/gitfast )
+
+
 fpath=(
     "$ZSH_HOME/completion.d"
     "$ZSH_HOME/bash_completion.d"
     "$HOME/completions"
+    "$ZSH_CACHE_DIR/completions"
     "$HOME/.ts-bin/completions"
     # for deno
     "$HOME/.bin/completions"
-    "$BUN_INSTALL/bin"
+    # "$BUN_INSTALL/bin"
+    ## regular git plugin is slow, use gitfast instead
+    "$OMZ_PATH/plugins/git"
+    # "$OMZ_PATH/plugins/gitfast"
     "$HOMEBREW_PREFIX/share/zsh/functions"
     "$HOMEBREW_PREFIX/share/zsh/site-functions"
     $fpath
@@ -35,5 +43,5 @@ fpath=(
     "$OMZ_PATH/plugins/httpie"
     "$OMZ_PATH/plugins/ripgrep"
     "$ANTIDOTE_HOME/z-shell/H-S-MW"
-    "$HOME/.bun"
+    # "$HOME/.bun"
 )

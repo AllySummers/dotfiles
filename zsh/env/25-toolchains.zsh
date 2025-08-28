@@ -8,6 +8,7 @@
 # █▄▀ █▄▄ █ ▀█ ▀▄▀
 
 export DENO_INSTALL="$HOME/.deno"
+export DENO_INSTALL_ROOT="$HOME/.deno"
 
 
 # ██▄ █ █ █▄ █

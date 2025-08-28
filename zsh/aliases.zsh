@@ -28,6 +28,9 @@ alias -g V='| $VISUAL -'
 
 # git root dir
 alias groot='git rev-parse --show-toplevel '
+alias reporoot='git rev-parse --show-toplevel '
+# git branch name
+alias gbranch='git rev-parse --abbrev-ref HEAD '
 # git repo name
 alias gname='basename $(git rev-parse --show-toplevel) '
 # git main branch name
@@ -63,20 +66,21 @@ alias gp-m='git pull origin master'
 alias gp-js='git pull origin jira-stable'
 # git pull head
 alias gp='git pull origin '
-alias gp-h='git pull origin $(git rev-parse --abbrev-ref HEAD)'
+alias gp-h='git pull origin $(git rev-parse --abbrev-ref HEAD) '
+
 
 # git main branch
 alias gb-main='git checkout $(gname) '
-alias gbp-pain='gb-main; gp-h'
+alias gbp-pain='gb-main; gp-h '
 
 # git main branch
-alias gb-main='git checkout master'
-alias gbp-main='gb-main; gp-h'
+alias gb-main='git checkout master '
+alias gbp-main='gb-main; gp-h '
 
 # list commands in a brew cellar (package)
 alias lsp="brew --cellar"
 alias brewformulas="curl --silent https://formulae.brew.sh/api/formula.json | fx "
-alias brewcasks="curl --silent https://formulae.brew.sh/api/cask.json | fx"
+alias brewcasks="curl --silent https://formulae.brew.sh/api/cask.json | fx "
 
 # node modules aliases
 alias pnx='node_modules/.bin/nx '

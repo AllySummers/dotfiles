@@ -3,7 +3,10 @@ export TERMINFO="$HOMEBREW_OPT/ncurses/share/terminfo:/Applications/kitty.app/Co
 export EDITOR=hx
 export VISUAL=$EDITOR
 
-if [[ "$TERM_PROGRAM" == "vscode" ]]; then
+# if editor is cursor (determined by `VSCODE_GIT_ASKPASS_MAIN` containing `Cursor.app`)
+if [[ "$VSCODE_GIT_ASKPASS_MAIN" == *"Cursor.app"* ]]; then
+    VISUAL=cursor
+elif [[ "$TERM_PROGRAM" == "vscode" ]]; then
     VISUAL=code-insiders
 fi
 
