@@ -1,0 +1,7 @@
+# atuin shell history. https://docs.atuin.sh/configuration/config/
+# Local-only by default; run `atuin login` to enable sync.
+style = "compact"
+inline_height = 25
+show_preview = true
+# Enter puts the selected command on the line to edit; press it again to run.
+enter_accept = false

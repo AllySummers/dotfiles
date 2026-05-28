@@ -1,0 +1,4 @@
+[tools]
+atuin = "latest"
+delta = "latest"
+node = "latest"
