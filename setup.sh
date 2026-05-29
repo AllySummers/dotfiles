@@ -6,11 +6,12 @@
 # materialise everything pinned in ~/.config/mise/config.toml (sheldon, etc.).
 # Supports macOS, Arch, Ubuntu and Debian.
 #
-# Usage: ./setup.sh [--gui] [--repo <url>]
+# Usage: ./setup.sh [--gui] [--repo <url>] [--branch <branch>]
 #
 # Flags:
-#   --gui          Also install GUI apps (macOS casks via ~/.Brewfile). Off by default.
-#   --repo <url>   Dotfiles git repo to apply (default: the AllySummers/dotfiles repo).
+#   --gui             Also install GUI apps (macOS casks via ~/.Brewfile). Off by default.
+#   --repo <url>      Dotfiles git repo to apply (default: the AllySummers/dotfiles repo).
+#   --branch <branch> Branch to check out (default: the repo's default branch).
 #
 # Environment:
 #   DOTFILES_SOURCE   If set to a directory, chezmoi uses it as the source instead of
@@ -20,12 +21,14 @@ set -euo pipefail
 
 DOTFILES_REPO="${DOTFILES_REPO:-https://github.com/AllySummers/dotfiles.git}"
 DOTFILES_SOURCE="${DOTFILES_SOURCE:-}"
+DOTFILES_BRANCH="${DOTFILES_BRANCH:-}"
 INSTALL_GUI=false
 
 while [ "$#" -gt 0 ]; do
   case "$1" in
-    --gui)   INSTALL_GUI=true; shift ;;
-    --repo)  DOTFILES_REPO="$2"; shift 2 ;;
+    --gui)     INSTALL_GUI=true; shift ;;
+    --repo)    DOTFILES_REPO="$2"; shift 2 ;;
+    --branch)  DOTFILES_BRANCH="$2"; shift 2 ;;
     *) echo "Unknown argument: $1" >&2; exit 1 ;;
   esac
 done
@@ -143,8 +146,10 @@ apply_dotfiles() {
     log "Applying dotfiles from local source: $DOTFILES_SOURCE"
     mise exec chezmoi -- chezmoi init --apply --source "$DOTFILES_SOURCE"
   else
-    log "Applying dotfiles from repo: $DOTFILES_REPO"
-    mise exec chezmoi -- chezmoi init --apply "$DOTFILES_REPO"
+    log "Applying dotfiles from repo: $DOTFILES_REPO${DOTFILES_BRANCH:+ (branch: $DOTFILES_BRANCH)}"
+    mise exec chezmoi -- chezmoi init --apply \
+      ${DOTFILES_BRANCH:+--branch "$DOTFILES_BRANCH"} \
+      "$DOTFILES_REPO"
   fi
   ok "Dotfiles applied"
 }
@@ -153,8 +158,26 @@ apply_dotfiles() {
 install_tools() {
   log "Installing pinned tools via mise (this can take a while)"
   mise trust --yes "$HOME/.config/mise/config.toml" 2>/dev/null || true
+  # Ensure $SHELL is set so post-install hooks (e.g. bun's completion generator)
+  # know the target shell — it may be unset in bare container environments.
+  export SHELL="${SHELL:-$(command -v zsh || command -v bash)}"
   mise install --yes
+  # misecompsync's postinstall hook skips mise itself (it's not a pinned tool).
+  # Sync it explicitly so _mise lands in the completions fpath directory.
+  misecompsync mise 2>/dev/null || true
   ok "Tools installed"
+}
+
+# ── Atuin agent hooks (claude-code, codex, pi) ───────────────────────────────
+install_atuin_hooks() {
+  if ! command -v atuin >/dev/null 2>&1; then
+    warn "atuin not found — skipping agent hook install"
+    return
+  fi
+  log "Installing atuin agent hooks"
+  for agent in claude-code codex pi; do
+    atuin hook install "$agent" 2>/dev/null && ok "atuin hook: $agent" || true
+  done
 }
 
 # ── GUI apps (opt-in, macOS only) ─────────────────────────────────────────────
@@ -181,6 +204,7 @@ install_mise
 install_chezmoi
 apply_dotfiles
 install_tools
+install_atuin_hooks
 install_gui
 
 log "Done! Open a new zsh session to use the configured shell."

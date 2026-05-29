@@ -13,7 +13,6 @@ use = [
   "compfix.zsh",
   "completion.zsh",
   "functions.zsh",
-  "git.zsh",
   "grep.zsh",
   "history.zsh",
   "key-bindings.zsh",

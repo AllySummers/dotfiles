@@ -1,7 +1,29 @@
 # atuin shell history. https://docs.atuin.sh/configuration/config/
 # Local-only by default; run `atuin login` to enable sync.
+
 style = "compact"
 inline_height = 25
 show_preview = true
 # Enter puts the selected command on the line to edit; press it again to run.
 enter_accept = false
+# Automatically filter to commands from the current git repo when inside one.
+workspaces = true
+# mise manages the atuin version, so no need for atuin's own update checker.
+update_check = false
+# In-memory daemon index — faster and supports score tuning.
+search_mode = "daemon-fuzzy"
+
+[daemon]
+enabled = true
+# Daemon manages its own lifecycle; no need to run it separately.
+autostart = true
+
+# Filter agent-run commands out of interactive search by default.
+# Agent commands (claude-code, codex, pi) are still recorded and searchable
+# via `atuin search --author '$all-agent'` but won't clutter Ctrl+R.
+[search]
+authors = ["$all-user"]
+
+# Sync v2: faster and more efficient. Takes effect when `atuin login` is run.
+[sync]
+records = true
