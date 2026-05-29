@@ -28,58 +28,12 @@ if command -v eza >/dev/null 2>&1; then
 fi
 
 alias groot='git rev-parse --show-toplevel '
-alias reporoot='git rev-parse --show-toplevel '
-alias gbranch='git rev-parse --abbrev-ref HEAD '
-alias gname='basename $(git rev-parse --show-toplevel) '
-alias grmain="git branch -a | rg 'HEAD -> origin/(.*)$' -or '$1' "
-alias glsunstaged='git --no-pager diff --name-only '
-alias lsunstaged='glsunstaged '
-alias glsu='glsunstaged '
-alias lsu='glsunstaged '
-alias glsstaged='git --no-pager diff --name-only --cached '
-alias lsstaged='glsstaged'
-alias lss='glsstaged'
-alias glss='glsstaged'
-alias latest-head='git merge-base HEAD origin/master'
-alias glsall='git --no-pager diff HEAD --name-only '
-alias lsall='glsall '
-alias lsa='glsall '
-alias glsa='glsall '
-alias gunstage='git restore --staged '
-alias gadd='git add '
-alias gignore='git update-index --skip-worktree '
-alias gunignore='git update-index --no-skip-worktree '
-alias gp-m='git pull origin master'
-alias gr-m='git pull --rebase origin master --no-edit '
-alias gp='git pull origin '
-alias gp-h='git pull origin $(git rev-parse --abbrev-ref HEAD) '
-alias gb-main='git checkout master '
-alias gbp-main='gb-main; gp-h '
-alias fixup='git log -n 10 --oneline --no-decorate --no-merges | fzf -0 --preview "git show --color=always --format=oneline {1}" | awk "{print $1}" | xargs -r git commit --fixup'
-
-alias lsp='brew --cellar'
-alias brewformulas='curl --silent https://formulae.brew.sh/api/formula.json | fx '
-alias brewcasks='curl --silent https://formulae.brew.sh/api/cask.json | fx '
-alias vpn='cisco '
-
-alias pnx='node_modules/.bin/nx '
-alias ptsx='node_modules/.bin/tsx '
-alias ptsc='node_modules/.bin/tsc '
-alias pesbuild='node -r esbuild-register '
-alias pesb='pesbuild '
-alias peslint='node_modules/.bin/eslint '
-alias pjscodeshift='node_modules/.bin/jscodeshift '
-alias pvitest='node_modules/.bin/vitest '
-alias pjest='node_modules/.bin/jest '
 
 alias -s git='git clone'
 alias -s md='mdcat'
 
 alias jsonl2json="jq --slurp '.'"
 alias ndjson2json="jq --slurp '.'"
-alias yarnpkgs='rg '\''resolution:\s*"(.*?)@workspace.*:(.*?)"'\'' -Nor $'\''$1:$2'\'' yarn.lock | jq -R '\''split(":") | {(.[0]): .[1]}'\'' | jq -s add '
-alias yarnpkgs-names='yarnpkgs | jq -r "keys[]" '
-alias yarnpkgs-dirs='yarnpkgs | jq -r "values[]" '
 alias sg='ast-grep '
 alias rgf='rg --hidden --files | rg '
 

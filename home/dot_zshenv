@@ -11,4 +11,6 @@ export ZSH_CONFIG_DIR="${ZSH_CONFIG_DIR:-$XDG_CONFIG_HOME/zsh}"
 
 source "$ZSH_CONFIG_DIR/env.zsh"
 
-[[ -o interactive ]] || eval "$(mise hook-env -s zsh)"
+if ! [[ -o interactive ]] && command -v mise >/dev/null 2>&1; then
+  eval "$(mise hook-env -s zsh)"
+fi

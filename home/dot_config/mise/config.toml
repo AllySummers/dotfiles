@@ -1,4 +1,54 @@
+
+[settings]
+experimental = true
+
 [tools]
-atuin = "latest"
-delta = "latest"
-node = "latest"
+atuin = "18.16.1"
+delta = "0.19.2"
+"github:alltuner/mise-completions-sync" = "0.5.9"
+node = "24.16.0"
+python = "3.14.5"
+ripgrep = "15.1.0"
+bat = "0.26.1"
+pipx = "1.12.0"
+ast-grep = "0.43.0"
+fd = "10.4.2"
+fx = "39.2.0"
+qsv = "19.1.0"
+yq = "4.53.2"
+usage = "3.3.0"
+jq = "1.8.1"
+pnpm = "11.4.0"
+bun = "1.3.14"
+chezmoi = "2.70.4"
+sheldon = "0.8.5"
+npm = "11.16.0"
+rust = "1.96.0"
+sd = "1.1.0"
+fzf = "0.73.1"
+go = "1.26.3"
+killport = "2.0.0"
+hyperfine = "1.20.0"
+gh = "2.93.0"
+deno = "2.8.1"
+aube = "1.16.0"
+watchexec = "2.5.1"
+"npm:typescript" = "6.0.3"
+"npm:tsx" = "4.22.3"
+uv = "0.11.17"
+hk = "1.46.0"
+pitchfork = "2.12.1"
+"npm:@withgraphite/graphite-cli" = "1.8.6"
+
+# agent lsp stuff
+"github:blackwell-systems/agent-lsp" = "0.11.2"
+"npm:typescript-language-server" = "5.3.0"
+"npm:bash-language-server" = "5.6.0"
+"npm:yaml-language-server" = "1.23.0"
+"npm:vscode-langservers-extracted" = "4.10.0"
+"github:sqls-server/sqls" = "0.2.45"
+"npm:dockerfile-language-server-nodejs" = "0.15.0"
+
+
+[hooks]
+postinstall = "misecompsync"
