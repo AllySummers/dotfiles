@@ -1,35 +1,57 @@
 # dotfiles
 
-Compact chezmoi-ready shell dotfiles.
+> **Work in progress** — this repo is very much incomplete. Things may be missing, broken, or subject to change.
 
-This repo uses `.chezmoiroot` with `home/` as the managed home tree:
+My personal dotfiles, managed with [chezmoi](https://chezmoi.io).
 
-```text
+## what's in here
+
+- **zsh** — shell config, aliases, env vars, and options split across tidy files
+- **mise** — tool version pinning for node, python, go, rust, bun, deno, and a bunch of CLI utilities
+- **sheldon** — zsh plugin manager
+- **atuin** — shell history
+- **git** — base gitconfig with machine-local overrides via include
+- **Cursor** — editor settings template
+
+## quick start
+
+```sh
+bash <(curl -fsSL https://raw.githubusercontent.com/AllySummers/dotfiles/main/setup.sh)
+```
+
+The script installs Homebrew (macOS), bootstraps mise, applies the dotfiles via chezmoi, and runs `mise install`. Works on macOS, Arch, Ubuntu, and Debian.
+
+Flags:
+
+```
+--gui             Also install GUI apps (macOS casks). Off by default.
+--repo <url>      Use a different dotfiles repo.
+--branch <branch> Check out a specific branch.
+```
+
+## repo layout
+
+```
 home/dot_zshenv                  -> ~/.zshenv
 home/dot_zprofile                -> ~/.zprofile
 home/dot_zshrc                   -> ~/.zshrc
 home/dot_gitconfig               -> ~/.gitconfig
-home/dot_config/zsh/aliases.zsh  -> ~/.config/zsh/aliases.zsh
-home/dot_config/zsh/env.zsh      -> ~/.config/zsh/env.zsh
-home/dot_config/zsh/options.zsh  -> ~/.config/zsh/options.zsh
-home/dot_config/sheldon          -> ~/.config/sheldon
-home/dot_config/mise             -> ~/.config/mise
-home/dot_config/atuin            -> ~/.config/atuin
+home/dot_config/zsh/             -> ~/.config/zsh/
+home/dot_config/sheldon/         -> ~/.config/sheldon/
+home/dot_config/mise/            -> ~/.config/mise/
+home/dot_config/atuin/           -> ~/.config/atuin/
 ```
 
-`dot_zshenv` loads the shared environment and runs `mise hook-env` for
-non-interactive shells so editor and agent commands get project env/PATH.
-Interactive shells use `mise activate zsh` from `dot_zshrc`.
+Machine-local overrides (not tracked):
 
-Machine-local overrides live in ignored files:
-
-```text
-home/dot_config/zsh/secrets.zsh
-home/dot_config/zsh/local.zsh
-home/dot_gitconfig.local
+```
+~/.config/zsh/secrets.zsh
+~/.config/zsh/local.zsh
+~/.gitconfig.local
 ```
 
-`dot_gitconfig` is tracked and `[include]`s `~/.gitconfig.local` last, so
-per-machine git settings (signing key, credential helpers) override the base.
-Git does not merge `~/.gitconfig` with `~/.config/git/config` — if the former
-exists the latter is ignored — so the explicit include is required.
+## license
+
+MIT — do whatever you want with it.
+
+That said, if you do something cool with this stuff, I'd genuinely love to hear about it. No obligation, just share if you feel like it. :)
