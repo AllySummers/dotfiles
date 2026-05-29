@@ -1,0 +1,41 @@
+[[ -o interactive ]] || return 0
+
+mkdir -p "$ZSH_CACHE_DIR/completions" "$ZSH_STATE_DIR"
+
+autoload -Uz colors add-zsh-hook compinit bashcompinit
+colors
+
+source "$ZSH_CONFIG_DIR/options.zsh"
+
+case "$OSTYPE" in
+  darwin*) export SHELDON_PROFILE="${SHELDON_PROFILE:-macos}" ;;
+esac
+
+# First compinit defines compdef for plugins that call it at load time.
+compinit -d "$ZSH_COMPDUMP_FILE"
+bashcompinit -d "$BASH_COMPDUMP_FILE"
+
+eval "$(mise exec -- sheldon source)"
+
+# Re-run after sheldon so plugin-provided completions (zsh-completions,
+# mac-zsh-completions, jq, ...) added to fpath get registered.
+compinit -d "$ZSH_COMPDUMP_FILE"
+
+source "$ZSH_CONFIG_DIR/aliases.zsh"
+[[ -r "$ZSH_CONFIG_DIR/local.zsh" ]] && source "$ZSH_CONFIG_DIR/local.zsh"
+
+eval "$(mise activate zsh)"
+
+if command -v atuin >/dev/null 2>&1; then
+  eval "$(atuin init zsh --disable-up-arrow)"
+fi
+
+autoload -Uz vcs_info
+zstyle ':vcs_info:git:*' formats ' (%b)'
+precmd_vcs_info() {
+  vcs_info
+}
+precmd_functions+=(precmd_vcs_info)
+PROMPT='%F{green}%~%F{blue}${vcs_info_msg_0_}%f '
+
+export GPG_TTY="$(tty)"

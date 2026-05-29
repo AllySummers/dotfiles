@@ -1,0 +1,181 @@
+#!/usr/bin/env bash
+#MISE description="Spin up a throwaway VM/container and run the dotfiles setup.sh"
+#MISE raw=true
+#USAGE arg "<os>" help="Target OS to test" {
+#USAGE   choices "macos" "arch" "ubuntu" "debian"
+#USAGE }
+#USAGE flag "--gui" help="Install GUI apps (macOS casks)"
+#USAGE flag "--keep" help="Keep the VM/container after the run instead of deleting it"
+#USAGE flag "--ssh" help="Open an interactive shell in the guest after install"
+#USAGE flag "--branch <branch>" help="Branch to check out in the guest (default: repo default)"
+#
+# Host orchestrator for testing the dotfiles install end-to-end.
+#
+#   macOS  -> Tart VM   (full macOS, Apple Silicon only)
+#   Linux  -> Docker    (ubuntu / debian / arch containers)
+#
+#   arch runs the official x86_64 image via Rosetta on Apple Silicon,
+#   and natively on x86_64 hosts (e.g. WSL).
+#
+# Examples:
+#   mise run setup-vm ubuntu              # Linux CLI test
+#   mise run setup-vm ubuntu --ssh        # ...then drop into a shell
+#   mise run setup-vm arch                # Arch Linux (x86_64)
+#   mise run setup-vm macos --gui         # macOS VM, also install GUI casks
+#   mise run setup-vm debian --keep       # keep the container around afterwards
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=tasks/lib/common.sh
+source "$SCRIPT_DIR/lib/common.sh"
+REPO_ROOT="$(repo_root)"
+
+# ── Arguments (parsed by mise from the USAGE spec above into usage_* env) ─────
+if [ -z "${usage_os:-}" ]; then
+  err "Run this through mise, e.g. 'mise run setup-vm ubuntu'."
+  exit 1
+fi
+
+OS="$usage_os"
+INSTALL_GUI="${usage_gui:-false}"
+KEEP="${usage_keep:-false}"
+OPEN_SSH="${usage_ssh:-false}"
+BRANCH="${usage_branch:-}"
+
+# Names of the resources the EXIT traps clean up (set once we know the target).
+run_vm=""
+container=""
+
+# Build the flag list passed through to the guest setup.sh.
+SETUP_FLAGS=()
+[ "$INSTALL_GUI" = true ] && SETUP_FLAGS+=(--gui)
+[ -n "$BRANCH" ] && SETUP_FLAGS+=(--branch "$BRANCH")
+
+# ════════════════════════════════════════════════════════════════════════════
+# macOS  → Tart
+# ════════════════════════════════════════════════════════════════════════════
+run_macos() {
+  require_cmd tart "Install with: brew install cirruslabs/cli/tart"
+
+  local base_vm="${TART_BASE_VM:-tahoe-base}"
+  local vm_user="${TART_VM_USER:-admin}"
+  # Script-scoped (not local) so the EXIT trap can still see it after return.
+  run_vm="dotfiles-test-macos"
+  local boot_wait="${TART_BOOT_WAIT:-45}"
+  local ssh_opts=(-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR)
+
+  if ! tart list | grep -q "[[:space:]]${base_vm}\b\|^${base_vm}\b"; then
+    err "Base VM '$base_vm' not found."
+    err "Pull it with: tart clone ghcr.io/cirruslabs/macos-tahoe-base:latest $base_vm"
+    exit 1
+  fi
+
+  cleanup_macos() {
+    if [ "$KEEP" = false ]; then
+      log "Cleaning up VM '$run_vm'"
+      tart stop "$run_vm" 2>/dev/null || true
+      tart delete "$run_vm" 2>/dev/null || true
+      ok "VM deleted"
+    else
+      warn "Keeping VM '$run_vm'. Remove later with: tart delete $run_vm"
+    fi
+  }
+  trap cleanup_macos EXIT
+
+  if tart list | grep -q "[[:space:]]${run_vm}\b\|^${run_vm}\b"; then
+    warn "VM '$run_vm' already exists — recreating for a clean run"
+    tart stop "$run_vm" 2>/dev/null || true
+    tart delete "$run_vm"
+  fi
+
+  log "Cloning '$base_vm' → '$run_vm'"
+  tart clone "$base_vm" "$run_vm"
+
+  log "Booting VM (headless)"
+  tart run --no-graphics "$run_vm" &
+  log "Waiting ${boot_wait}s for boot + IP"
+  sleep "$boot_wait"
+
+  local ip
+  ip="$(tart ip "$run_vm" 2>/dev/null)" || { err "Could not get VM IP"; exit 1; }
+  ok "VM is up at $ip"
+
+  log "Copying repo to VM"
+  ssh "${ssh_opts[@]}" "$vm_user@$ip" "rm -rf ~/dotfiles && mkdir -p ~/dotfiles"
+  # Copy the working tree (so local, uncommitted changes are tested too).
+  scp "${ssh_opts[@]}" -r "$REPO_ROOT/." "$vm_user@$ip:dotfiles/" >/dev/null
+
+  log "Running setup.sh in VM (flags: ${SETUP_FLAGS[*]:-none})"
+  ssh "${ssh_opts[@]}" -t "$vm_user@$ip" \
+    "cd ~/dotfiles && DOTFILES_SOURCE=\$HOME/dotfiles ./setup.sh ${SETUP_FLAGS[*]:-}"
+  ok "Install complete"
+
+  if [ "$OPEN_SSH" = true ]; then
+    warn "Opening interactive shell (type 'exit' to finish)"
+    ssh "${ssh_opts[@]}" -t "$vm_user@$ip" "zsh -l" || true
+  fi
+}
+
+# ════════════════════════════════════════════════════════════════════════════
+# Linux  → Docker
+# ════════════════════════════════════════════════════════════════════════════
+run_linux() {
+  require_cmd docker "Install Docker Desktop or the docker CLI."
+
+  local image platform_flag=() extra_flags=()
+  case "$OS" in
+    # Arch only publishes x86_64 images. On Apple Silicon this runs via Rosetta,
+    # which breaks pacman's seccomp sandbox — disable it for the container.
+    arch)   image="archlinux:latest"
+            platform_flag=(--platform linux/amd64)
+            extra_flags=(--security-opt seccomp=unconfined) ;;
+    ubuntu) image="ubuntu:latest" ;;
+    debian) image="debian:latest" ;;
+  esac
+
+  # Script-scoped (not local) so the EXIT trap can still see it after return.
+  container="dotfiles-test-$OS"
+
+  cleanup_linux() {
+    if [ "$KEEP" = false ]; then
+      log "Cleaning up container '$container'"
+      docker rm -f "$container" >/dev/null 2>&1 || true
+      ok "Container removed"
+    else
+      warn "Keeping container '$container'. Shell in with: docker exec -it $container zsh -l"
+      warn "Remove later with: docker rm -f $container"
+    fi
+  }
+  trap cleanup_linux EXIT
+
+  docker rm -f "$container" >/dev/null 2>&1 || true
+
+  log "Starting $image container '$container'"
+  # Keep it alive with sleep so we can exec setup + an optional shell into it.
+  docker run -d "${platform_flag[@]}" "${extra_flags[@]}" --name "$container" \
+    -v "$REPO_ROOT:/dotfiles:ro" \
+    -e DOTFILES_SOURCE=/dotfiles \
+    "$image" sleep infinity >/dev/null
+  ok "Container running"
+
+  # Use a TTY only when we have one (keeps `mise run` non-interactive safe).
+  local tty_flag=()
+  [ -t 1 ] && tty_flag=(-t)
+
+  log "Running setup.sh in container (flags: ${SETUP_FLAGS[*]:-none})"
+  docker exec -i "${tty_flag[@]}" "$container" \
+    bash /dotfiles/setup.sh "${SETUP_FLAGS[@]}"
+  ok "Install complete"
+
+  if [ "$OPEN_SSH" = true ]; then
+    warn "Opening interactive shell (type 'exit' to finish)"
+    docker exec -it "$container" zsh -l
+  fi
+}
+
+case "$OS" in
+  macos) run_macos ;;
+  arch|ubuntu|debian) run_linux ;;
+  *) err "Unsupported OS: $OS"; exit 1 ;;
+esac

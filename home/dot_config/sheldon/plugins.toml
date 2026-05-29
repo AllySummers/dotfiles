@@ -1,0 +1,101 @@
+shell = "zsh"
+
+[templates]
+defer = "{{ hooks?.pre | nl }}{% for file in files %}zsh-defer source \"{{ file }}\"\n{% endfor %}{{ hooks?.post | nl }}"
+
+[plugins]
+
+[plugins.oh-my-zsh-lib]
+github = "ohmyzsh/ohmyzsh"
+dir = "lib"
+use = [
+  "clipboard.zsh",
+  "compfix.zsh",
+  "completion.zsh",
+  "functions.zsh",
+  "grep.zsh",
+  "history.zsh",
+  "key-bindings.zsh",
+  "misc.zsh",
+  "spectrum.zsh",
+  "termsupport.zsh",
+  "theme-and-appearance.zsh",
+]
+
+[plugins.omz-colored-man-pages]
+github = "ohmyzsh/ohmyzsh"
+dir = "plugins/colored-man-pages"
+
+[plugins.omz-command-not-found]
+github = "ohmyzsh/ohmyzsh"
+dir = "plugins/command-not-found"
+
+[plugins.omz-copyfile]
+github = "ohmyzsh/ohmyzsh"
+dir = "plugins/copyfile"
+
+[plugins.omz-copypath]
+github = "ohmyzsh/ohmyzsh"
+dir = "plugins/copypath"
+
+[plugins.omz-docker]
+github = "ohmyzsh/ohmyzsh"
+dir = "plugins/docker"
+
+[plugins.omz-docker-compose]
+github = "ohmyzsh/ohmyzsh"
+dir = "plugins/docker-compose"
+
+[plugins.omz-extract]
+github = "ohmyzsh/ohmyzsh"
+dir = "plugins/extract"
+
+[plugins.omz-git]
+github = "ohmyzsh/ohmyzsh"
+dir = "plugins/git"
+
+[plugins.omz-github]
+github = "ohmyzsh/ohmyzsh"
+dir = "plugins/github"
+
+[plugins.omz-gitignore]
+github = "ohmyzsh/ohmyzsh"
+dir = "plugins/gitignore"
+
+[plugins.omz-macos]
+github = "ohmyzsh/ohmyzsh"
+dir = "plugins/macos"
+profiles = ["macos"]
+
+[plugins.omz-man]
+github = "ohmyzsh/ohmyzsh"
+dir = "plugins/man"
+
+[plugins.omz-urltools]
+github = "ohmyzsh/ohmyzsh"
+dir = "plugins/urltools"
+
+[plugins.zsh-defer]
+github = "romkatv/zsh-defer"
+
+[plugins.zsh-autosuggestions]
+github = "zsh-users/zsh-autosuggestions"
+apply = ["defer"]
+
+[plugins.fast-syntax-highlighting]
+github = "z-shell/F-Sy-H"
+apply = ["defer"]
+
+[plugins.zsh-brew-services]
+github = "vasyharan/zsh-brew-services"
+profiles = ["macos"]
+
+[plugins.zsh-completions]
+github = "clarketm/zsh-completions"
+
+[plugins.mac-zsh-completions]
+github = "scriptingosx/mac-zsh-completions"
+profiles = ["macos"]
+
+[plugins.jq-zsh-plugin]
+github = "reegnz/jq-zsh-plugin"

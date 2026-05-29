@@ -1,0 +1,30 @@
+[user]
+	name = Ally Summers
+	email = git@ay.ms
+[init]
+	defaultBranch = main
+[push]
+	autoSetupRemote = true
+[merge]
+	renameLimit = 999999
+	conflictStyle = zdiff3
+[credential "https://dev.azure.com"]
+	useHttpPath = true
+[gpg]
+	format = ssh
+[oh-my-zsh]
+	hide-dirty = 1
+[core]
+	pager = delta
+[interactive]
+	diffFilter = delta --color-only
+[delta]
+	navigate = true
+	line-numbers = true
+	side-by-side = true
+[diff]
+	colorMoved = default
+# Per-machine signing key, gpgsign, and credential helpers. Create
+# ~/.gitconfig.local on each machine; included last so it overrides.
+[include]
+	path = ~/.gitconfig.local
