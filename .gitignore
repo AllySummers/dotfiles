@@ -3,3 +3,4 @@
 /home/dot_config/zsh/secrets.zsh
 /home/dot_gitconfig.local
 .vscode/settings.json
+node_modules

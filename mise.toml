@@ -1,2 +1,35 @@
+min_version = "2026.5.0"
+experimental_monorepo_root = true
+
+[monorepo]
+config_roots = ["home/dot_config/mise"]
+
+[tools]
+aube = '1.17.1'
+node = '26.3.0'
+hk = '1.46.0'
+usage = '3.3.0'
+pkl = '0.31.1'
+
+[deps.aube]
+auto = true
+
+[settings]
+experimental = true
+
 [task_config]
 includes = ["tasks"]
+
+[hooks]
+postinstall = ["hk install --mise", "mise deps install"]
+
+[shell_alias]
+mr = 'mise tasks run '
+mi = 'mise install '
+
+[env]
+HK_MISE = "1"
+HK_HIDE_WHEN_DONE = "true"
+MISE_EXPERIMENTAL = "1"
+
+_.path = ["{{config_root}}/node_modules/.bin"]

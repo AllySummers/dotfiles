@@ -228,5 +228,6 @@
     "**/node_modules/*/**": true,
     "**/.hg/store/**": true,
     "**/.next/**": true
-  }
+  },
+  "update.releaseTrack": "dev"
 }
