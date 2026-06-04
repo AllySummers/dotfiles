@@ -1,12 +1,7 @@
 min_version = "2026.5.0"
-experimental_monorepo_root = true
-
-[monorepo]
-config_roots = ["home/dot_config/mise"]
 
 [tools]
-aube = '1.17.1'
-node = '26.3.0'
+deno = '2.8.2'
 hk = '1.46.0'
 usage = '3.3.0'
 pkl = '0.31.1'
@@ -18,7 +13,7 @@ auto = true
 experimental = true
 
 [task_config]
-includes = ["tasks"]
+includes = ["tasks", "home/dot_config/mise/tasks"]
 
 [hooks]
 postinstall = ["hk install --mise", "mise deps install"]

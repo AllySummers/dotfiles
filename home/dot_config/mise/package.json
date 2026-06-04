@@ -1,9 +1,0 @@
-{
-  "name": "@dotfiles/mise-tasks",
-  "version": "0.0.1",
-  "type": "module",
-  "dependencies": {
-    "@std/path": "jsr:1.1.5",
-    "@std/toml": "jsr:1.0.11"
-  }
-}

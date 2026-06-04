@@ -1,21 +1,13 @@
-#!/usr/bin/env node
-/* eslint-disable no-console -- CLI script: console output is intentional */
+#!/usr/bin/env -S deno run --allow-env --allow-run --allow-read --allow-write --allow-net
 //MISE description="Sync shell completions for all installed mise tools"
-//MISE alias="sync-completions"
 //USAGE flag "--force -f" help="Regenerate all completions regardless of cached version"
 //USAGE flag "--verbose -v" help="Print per-tool status"
 //USAGE flag "--shell <shell>" help="Limit sync to a specific shell" {
 //USAGE   choices "zsh" "bash" "fish"
 //USAGE }
 
-import { execFile as execFileCb } from 'node:child_process';
-import { access, mkdir, readFile, writeFile } from 'node:fs/promises';
-import { join } from 'node:path';
-import { pathToFileURL } from 'node:url';
-import { promisify } from 'node:util';
-import { parse as parseToml } from '@std/toml';
-
-const execFileAsync = promisify(execFileCb);
+import { join } from 'jsr:@std/path@1.1.5';
+import { parse as parseToml } from 'jsr:@std/toml@1.0.11';
 
 // ── Public types (imported by custom-completions.ts) ─────────────────────────
 
@@ -34,10 +26,7 @@ export type Shell = 'zsh' | 'bash' | 'fish';
  * Return the completion file content for a given tool + shell, or null to skip
  * that shell entirely.
  */
-export type CustomCompletionFn = (
-  tool: MiseToolInfo,
-  shell: Shell,
-) => Promise<string | null>;
+export type CustomCompletionFn = (tool: MiseToolInfo, shell: Shell) => Promise<string | null>;
 
 // ── Internal types ────────────────────────────────────────────────────────────
 
@@ -60,32 +49,26 @@ interface State {
 
 // ── Config ────────────────────────────────────────────────────────────────────
 
+const HOME = Deno.env.get('HOME') ?? '';
 const TASK_DIR = import.meta.dirname ?? '';
-const ALL_SHELLS: Shell[] = ['zsh', 'bash', 'fish'];
-
-// eslint-disable-next-line n/no-process-env
-const { HOME = '', usage_force, usage_shell, usage_verbose } = process.env;
-
 const BASE_DIR = join(HOME, '.local', 'share', 'mise-completions');
 const STATE_PATH = join(BASE_DIR, '.state.json');
+const ALL_SHELLS: Shell[] = ['zsh', 'bash', 'fish'];
 
 // Respect env vars set by the `usage` CLI when available, fall back to raw args
-const args = process.argv.slice(2);
+const force = Deno.env.get('usage_force') === 'true' ||
+  Deno.args.some((a) => a === '--force' || a === '-f');
 
-const force =
-  usage_force === 'true' || args.some((a) => a === '--force' || a === '-f');
+const verbose = Deno.env.get('usage_verbose') === 'true' ||
+  Deno.args.some((a) => a === '--verbose' || a === '-v');
 
-const verbose =
-  usage_verbose === 'true' || args.some((a) => a === '--verbose' || a === '-v');
+const shellFlagIdx = Deno.args.indexOf('--shell');
+const shellArg = Deno.env.get('usage_shell') ||
+  (shellFlagIdx !== -1 ? Deno.args[shellFlagIdx + 1] : undefined);
 
-const shellFlagIdx = args.indexOf('--shell');
-const shellArg =
-  usage_shell || (shellFlagIdx !== -1 ? args[shellFlagIdx + 1] : undefined);
-
-const SHELLS: Shell[] =
-  shellArg && (ALL_SHELLS as string[]).includes(shellArg)
-    ? [shellArg as Shell]
-    : ALL_SHELLS;
+const SHELLS: Shell[] = shellArg && (ALL_SHELLS as string[]).includes(shellArg)
+  ? [shellArg as Shell]
+  : ALL_SHELLS;
 
 // ── Logging ───────────────────────────────────────────────────────────────────
 
@@ -99,7 +82,7 @@ const log = (...msg: unknown[]) => {
 
 function completionFile(tool: string, shell: Shell): string {
   // Use only the last path segment so scoped packages don't break filenames
-  const base = (tool.split('/').at(-1) ?? tool).replaceAll('@', '');
+  const base = tool.split('/').at(-1)!.replaceAll('@', '');
   if (shell === 'zsh') {
     return `_${base}`;
   }
@@ -112,13 +95,16 @@ function completionFile(tool: string, shell: Shell): string {
 // ── Subprocess helper ─────────────────────────────────────────────────────────
 
 async function exec(argv: string[]): Promise<{ out: string; ok: boolean }> {
-  const [cmd, ...cmdArgs] = argv;
   try {
-    const { stdout } = await execFileAsync(cmd, cmdArgs, { encoding: 'utf8' });
-    return { out: stdout, ok: true };
-  } catch (error: unknown) {
-    const e = error as { stdout?: string };
-    return { out: e.stdout ?? '', ok: false };
+    const proc = new Deno.Command(argv[0], {
+      args: argv.slice(1),
+      stdout: 'piped',
+      stderr: 'null',
+    });
+    const result = await proc.output();
+    return { out: new TextDecoder().decode(result.stdout), ok: result.success };
+  } catch {
+    return { out: '', ok: false };
   }
 }
 
@@ -126,23 +112,21 @@ async function exec(argv: string[]): Promise<{ out: string; ok: boolean }> {
 
 async function readState(): Promise<State> {
   try {
-    return JSON.parse(await readFile(STATE_PATH, 'utf8')) as State;
+    return JSON.parse(await Deno.readTextFile(STATE_PATH));
   } catch {
     return { schema_version: 1, tools: {} };
   }
 }
 
 async function saveState(s: State): Promise<void> {
-  await mkdir(BASE_DIR, { recursive: true });
-  await writeFile(STATE_PATH, `${JSON.stringify(s, null, 2)}\n`, 'utf8');
+  await Deno.mkdir(BASE_DIR, { recursive: true });
+  await Deno.writeTextFile(STATE_PATH, `${JSON.stringify(s, null, 2)}\n`);
 }
 
 // ── Registry ──────────────────────────────────────────────────────────────────
 
 async function loadRegistry(): Promise<Registry> {
-  return parseToml(
-    await readFile(join(TASK_DIR, 'registry.toml'), 'utf8'),
-  ) as unknown as Registry;
+  return parseToml(await Deno.readTextFile(join(TASK_DIR, 'registry.toml'))) as unknown as Registry;
 }
 
 function resolveCmd(tool: string, shell: Shell, reg: Registry): string | null {
@@ -150,10 +134,9 @@ function resolveCmd(tool: string, shell: Shell, reg: Registry): string | null {
   if (!entry) {
     return null;
   }
-  const map: ShellMap =
-    typeof entry === 'string' ? (reg.patterns[entry] ?? {}) : entry;
+  const map: ShellMap = typeof entry === 'string' ? (reg.patterns[entry] ?? {}) : entry;
   const tmpl = map[shell];
-  return tmpl !== undefined ? tmpl.replaceAll('{}', tool) : null;
+  return tmpl != null ? tmpl.replaceAll('{}', tool) : null;
 }
 
 // ── Custom completions ────────────────────────────────────────────────────────
@@ -161,9 +144,9 @@ function resolveCmd(tool: string, shell: Shell, reg: Registry): string | null {
 async function loadCustom(): Promise<Record<string, CustomCompletionFn>> {
   const path = join(TASK_DIR, 'custom-completions.ts');
   try {
-    await access(path);
-    const mod = await import(pathToFileURL(path).href);
-    return (mod.default ?? {}) as Record<string, CustomCompletionFn>;
+    await Deno.stat(path);
+    const mod = await import(`file://${path}`);
+    return (mod.default as Record<string, CustomCompletionFn>) ?? {};
   } catch {
     return {};
   }
@@ -176,7 +159,7 @@ async function discoverTools(): Promise<Record<string, MiseToolInfo>> {
   if (!ok || !out.trim()) {
     return {};
   }
-  const raw = JSON.parse(out) as Record<string, MiseToolInfo[]>;
+  const raw: Record<string, MiseToolInfo[]> = JSON.parse(out);
   return Object.fromEntries(
     Object.entries(raw).flatMap(([name, list]) => {
       const active = list.find((t) => t.active) ?? list.at(-1);
@@ -195,20 +178,16 @@ async function addMiseSelf(tools: Record<string, MiseToolInfo>): Promise<void> {
   if (!ok) {
     return;
   }
-  const [version = ''] = out.trim().split(/\s+/);
+  const version = out.trim().split(/\s+/)[0];
   tools.mise = { version, install_path: '', installed: true, active: true };
 }
 
 // ── Write completions ─────────────────────────────────────────────────────────
 
-async function writeCompletion(
-  tool: string,
-  shell: Shell,
-  content: string,
-): Promise<void> {
+async function writeCompletion(tool: string, shell: Shell, content: string): Promise<void> {
   const dir = join(BASE_DIR, shell);
-  await mkdir(dir, { recursive: true });
-  await writeFile(join(dir, completionFile(tool, shell)), content, 'utf8');
+  await Deno.mkdir(dir, { recursive: true });
+  await Deno.writeTextFile(join(dir, completionFile(tool, shell)), content);
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
@@ -223,14 +202,14 @@ async function main(): Promise<void> {
 
   await addMiseSelf(tools);
 
-  let failed = 0,
+  let updated = 0,
     skipped = 0,
-    updated = 0;
+    failed = 0;
 
   for (const [name, info] of Object.entries(tools)) {
     if (!force && state.tools[name] === info.version) {
       log(`  skip   ${name}@${info.version}`);
-      skipped += 1;
+      skipped++;
       continue;
     }
 
@@ -241,15 +220,15 @@ async function main(): Promise<void> {
       let content: string | null = null;
 
       // 1. Custom handler takes priority over the registry
-      if (Object.hasOwn(custom, name)) {
+      if (custom[name]) {
         tried = true;
         try {
           content = await custom[name](info, shell);
           if (content !== null) {
             log(`  custom ${name} (${shell})`);
           }
-        } catch (error: unknown) {
-          log(`  error  ${name} custom handler (${shell}): ${String(error)}`);
+        } catch (error) {
+          log(`  error  ${name} custom handler (${shell}): ${error}`);
           continue;
         }
       }
@@ -270,23 +249,19 @@ async function main(): Promise<void> {
         content = out;
       }
 
-      if (content.trim()) {
+      if (content?.trim()) {
         await writeCompletion(name, shell, content);
-        log(
-          `  wrote  ${name}@${info.version} → ${shell}/${completionFile(name, shell)}`,
-        );
+        log(`  wrote  ${name}@${info.version} → ${shell}/${completionFile(name, shell)}`);
         written = true;
       }
     }
 
     if (written) {
       state.tools[name] = info.version;
-      updated += 1;
+      updated++;
     } else if (tried) {
-      console.warn(
-        `  WARN   ${name}: completion generation failed for all shells`,
-      );
-      failed += 1;
+      console.warn(`  WARN   ${name}: completion generation failed for all shells`);
+      failed++;
     }
     // Not in registry + no custom handler → silently ignored
   }
@@ -300,7 +275,7 @@ async function main(): Promise<void> {
   console.log(`sync-completions: ${parts.join(', ')}`);
 }
 
-main().catch((error: unknown) => {
+main().catch((error) => {
   console.error(error);
-  process.exit(1);
+  Deno.exit(1);
 });

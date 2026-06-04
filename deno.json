@@ -1,0 +1,22 @@
+{
+  "version": "0.0.0",
+  "license": "MIT",
+  "compilerOptions": {
+    "strict": true
+  },
+  "lock": false,
+  "nodeModulesDir": "none",
+  "vendor": false,
+  "fmt": {
+    "include": ["home/dot_config/mise/tasks/sync-completions"],
+    "semiColons": true,
+    "singleQuote": true,
+    "indentWidth": 2,
+    "lineWidth": 100
+  },
+  "lint": {
+    "rules": {
+      "exclude": ["no-import-prefix"]
+    }
+  }
+}
