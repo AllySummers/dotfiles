@@ -13,20 +13,7 @@
  * Return the completion file contents as a string, or null to skip that shell.
  */
 
-interface MiseToolInfo {
-  version: string;
-  requested_version?: string;
-  install_path: string;
-  source?: { type: string; path: string };
-  installed: boolean;
-  active: boolean;
-}
-
-type Shell = 'zsh' | 'bash' | 'fish';
-type CustomCompletionFn = (
-  tool: MiseToolInfo,
-  shell: Shell,
-) => Promise<string | null>;
+import type { CustomCompletionFn } from './shared.ts';
 
 export const handlers: Record<string, CustomCompletionFn> = {
   // ── Example: fetch completions from a remote URL ───────────────────────────

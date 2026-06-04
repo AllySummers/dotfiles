@@ -3,11 +3,7 @@ import "package://github.com/jdx/hk/releases/download/v1.46.0/hk@1.46.0#/Builtin
 
 local linters = new Mapping<String, Step> {
     ["check-merge-conflict"] = Builtins.check_merge_conflict
-    // don't fail on warnings
-    ["oxlint"] = (Builtins.ox_lint) {
-        check = "oxlint --format=stylish {{ files }}"
-    }
-    ["oxfmt"] = Builtins.oxfmt
+    ["deno"] = Builtins.deno
 }
 
 hooks {

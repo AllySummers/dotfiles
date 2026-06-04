@@ -2,13 +2,15 @@
   "version": "0.0.0",
   "license": "MIT",
   "compilerOptions": {
-    "strict": true
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "verbatimModuleSyntax": true
   },
   "lock": false,
   "nodeModulesDir": "none",
   "vendor": false,
   "fmt": {
-    "include": ["home/dot_config/mise/tasks/sync-completions"],
+    "include": ["home/dot_config/mise/tasks/sync-completions", "home/dot_config/mise/completion-sync/*.ts"],
     "semiColons": true,
     "singleQuote": true,
     "indentWidth": 2,
