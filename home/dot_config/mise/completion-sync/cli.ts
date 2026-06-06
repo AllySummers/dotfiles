@@ -1,6 +1,7 @@
 import { dirname, join } from 'jsr:@std/path@1.1.5';
 import { parse as parseToml } from 'jsr:@std/toml@1.0.11';
-import type { CLIOptions, CustomCompletionFn, MiseToolInfo, Shell } from './shared.ts';
+import type { CLIOptions, MiseToolInfo, Shell } from './shared.ts';
+import { handlers as custom } from './custom-completions.ts';
 
 // ── Internal types ────────────────────────────────────────────────────────────
 
@@ -30,26 +31,31 @@ export type DiscoverMode =
   | { type: 'global' }
   | { type: 'local'; cwd?: string };
 
-const ALL_SHELLS: Shell[] = ['zsh', 'bash', 'fish'];
-
 // ── Shell filename convention ─────────────────────────────────────────────────
 
 const completionFile = (tool: string, shell: Shell): string => {
   const base = tool.split('/').at(-1)!.replaceAll('@', '');
-  if (shell === 'zsh') return `_${base}`;
-  if (shell === 'fish') return `${base}.fish`;
+  if (shell === 'zsh') {
+    return `_${base}`;
+  }
+  if (shell === 'fish') {
+    return `${base}.fish`;
+  }
   return base;
 };
 
 // ── Subprocess helper ─────────────────────────────────────────────────────────
 
 const exec = async (
-  argv: string[],
+  [cmd, ...args]: string[],
   opts?: { cwd?: string },
 ): Promise<{ out: string; ok: boolean }> => {
+  if (!cmd) {
+    throw new Error('cmd is required');
+  }
   try {
-    const proc = new Deno.Command(argv[0]!, {
-      args: argv.slice(1),
+    const proc = new Deno.Command(cmd, {
+      args,
       stdout: 'piped',
       stderr: 'null',
       cwd: opts?.cwd,
@@ -85,16 +91,12 @@ const loadRegistry = async (registryPath: string): Promise<Registry> =>
 
 const resolveCmd = (tool: string, shell: Shell, reg: Registry): string | null => {
   const entry = reg.tools[tool];
-  if (!entry) return null;
+  if (!entry) {
+    return null;
+  }
   const map: ShellMap = typeof entry === 'string' ? (reg.patterns[entry] ?? {}) : entry;
   const tmpl = map[shell];
   return tmpl != null ? tmpl.replaceAll('{}', tool) : null;
-};
-
-// ── Custom completions ────────────────────────────────────────────────────────
-
-const loadCustom = async (): Promise<Record<string, CustomCompletionFn>> => {
-  return (await import('./custom-completions.ts')).handlers;
 };
 
 // ── Tool discovery ────────────────────────────────────────────────────────────
@@ -112,7 +114,9 @@ const discoverTools = async (
   const opts = { cwd: mode.type === 'local' ? mode.cwd : undefined };
 
   const { out, ok } = await exec(args, opts);
-  if (!ok || !out.trim()) return {};
+  if (!ok || !out.trim()) {
+    return {};
+  }
   const raw: Record<string, MiseToolInfo[]> = JSON.parse(out);
   return Object.fromEntries(
     Object.entries(raw).flatMap(([name, list]) => {
@@ -129,7 +133,9 @@ const discoverTools = async (
  */
 const addMiseSelf = async (tools: Record<string, MiseToolInfo>): Promise<void> => {
   const { out, ok } = await exec(['mise', '--version']);
-  if (!ok) return;
+  if (!ok) {
+    return;
+  }
   const version = out.trim().split(/\s+/).at(0) ?? '';
   tools.mise = { version, install_path: '', installed: true, active: true };
 };
@@ -152,89 +158,79 @@ const writeCompletion = async (
 export const cli = async (
   { taskDir, statePath, completionsPath, force = false, verbose = false, shell }: CLIOptions,
 ) => {
-  const shellName = shell ?? Deno.env.get('SHELL')?.split('/').at(-1);
-  if (!shellName || !(ALL_SHELLS as string[]).includes(shellName)) {
-    throw new Error(
-      `Cannot determine shell: $SHELL=${
-        Deno.env.get('SHELL') ?? '(unset)'
-      }, pass --shell explicitly`,
-    );
-  }
-  const shells = [shellName as Shell];
-
   const log = (...msg: unknown[]) => {
-    if (verbose) console.log(...msg);
+    if (verbose) {
+      console.log(...msg);
+    }
   };
 
-  const [state, registry, custom, tools] = await Promise.all([
+  const [state, registry, tools] = await Promise.all([
     readState(statePath),
     loadRegistry(join(taskDir, 'registry.toml')),
-    loadCustom(),
     discoverTools({ type: 'global' }),
   ]);
 
   await addMiseSelf(tools);
 
-  let updated = 0, skipped = 0, failed = 0;
+  const statuses = await Promise.all(
+    Object.entries(tools).map(async ([name, info]) => {
+      if (!force && state.tools[name] === info.version) {
+        log(`  skip   ${name}@${info.version}`);
+        return 'skipped' as const;
+      }
 
-  for (const [name, info] of Object.entries(tools)) {
-    if (!force && state.tools[name] === info.version) {
-      log(`  skip   ${name}@${info.version}`);
-      skipped++;
-      continue;
-    }
-
-    let written = false;
-    let tried = false;
-
-    for (const sh of shells) {
       let content: string | null = null;
 
       if (custom[name]) {
-        tried = true;
         try {
-          content = await custom[name](info, sh);
-          if (content !== null) log(`  custom ${name} (${sh})`);
+          content = await custom[name](info, shell);
+          if (content !== null) {
+            log(`  custom ${name} (${shell})`);
+          }
         } catch (error) {
-          log(`  error  ${name} custom handler (${sh}): ${error}`);
-          continue;
+          log(`  error  ${name} custom handler (${shell}): ${error}`);
+          console.warn(`  WARN   ${name}: completion generation failed`);
+          return 'failed' as const;
         }
       }
 
       if (content === null) {
-        const cmd = resolveCmd(name, sh, registry);
+        const cmd = resolveCmd(name, shell, registry);
         if (!cmd) {
-          log(`  no-cmd ${name} (${sh})`);
-          continue;
+          log(`  no-cmd ${name} (${shell})`);
+          if (custom[name]) {
+            console.warn(`  WARN   ${name}: completion generation failed`);
+            return 'failed' as const;
+          }
+          return null;
         }
-        tried = true;
         const { out, ok } = await exec(cmd.split(/\s+/));
         if (!ok || !out.trim()) {
-          log(`  fail   ${name} (${sh}): ${cmd}`);
-          continue;
+          log(`  fail   ${name} (${shell}): ${cmd}`);
+          console.warn(`  WARN   ${name}: completion generation failed`);
+          return 'failed' as const;
         }
         content = out;
       }
 
-      if (content?.trim()) {
-        await writeCompletion(name, sh, content, completionsPath);
-        log(`  wrote  ${name}@${info.version} → ${sh}/${completionFile(name, sh)}`);
-        written = true;
+      if (!content.trim()) {
+        console.warn(`  WARN   ${name}: completion generation failed`);
+        return 'failed' as const;
       }
-    }
 
-    if (written) {
+      await writeCompletion(name, shell, content, completionsPath);
+      log(`  wrote  ${name}@${info.version} → ${shell}/${completionFile(name, shell)}`);
       state.tools[name] = info.version;
-      updated++;
-    } else if (tried) {
-      console.warn(`  WARN   ${name}: completion generation failed for all shells`);
-      failed++;
-    }
-  }
+      return 'updated' as const;
+    }),
+  );
 
   await saveState(state, statePath);
 
-  const parts = [`updated: ${updated}`, `skipped: ${skipped}`];
-  if (failed) parts.push(`failed: ${failed}`);
+  const count = (s: string) => statuses.filter((r) => r === s).length;
+  const parts = [`updated: ${count('updated')}`, `skipped: ${count('skipped')}`];
+  if (count('failed')) {
+    parts.push(`failed: ${count('failed')}`);
+  }
   console.log(`sync-completions: ${parts.join(', ')}`);
 };

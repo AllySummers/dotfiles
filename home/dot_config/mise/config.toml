@@ -57,8 +57,8 @@ pitchfork = "2.12.1"
 "github:sqls-server/sqls" = "0.2.45"
 "npm:dockerfile-language-server-nodejs" = "0.15.0"
 
-# [hooks]
-# postinstall = "mise run sync-completions"
+[hooks]
+postinstall = ['mise run sync-completions']
 
 [task_config]
 includes = ["tasks"]

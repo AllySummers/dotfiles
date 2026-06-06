@@ -1,13 +1,12 @@
 export type Shell = 'zsh' | 'bash' | 'fish';
 
 export interface CLIOptions {
-  home: string;
   taskDir: string;
   statePath: string;
   completionsPath: string;
   force?: boolean;
   verbose?: boolean;
-  shell?: Shell;
+  shell: Shell;
 }
 
 export interface MiseToolInfo {
