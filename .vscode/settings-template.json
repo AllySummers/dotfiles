@@ -6,5 +6,6 @@
   },
   "files.associations": {
     "home/dot_config/mise/tasks/sync-completions": "typescript"
-  }
+  },
+  "deno.enable": true
 }

@@ -3,7 +3,7 @@ min_version = "2026.5.0"
 [tools]
 deno = '2.8.2'
 hk = '1.46.0'
-usage = '3.3.0'
+usage = "3.4.0"
 pkl = '0.31.1'
 
 [deps.aube]
