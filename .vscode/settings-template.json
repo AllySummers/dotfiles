@@ -5,7 +5,7 @@
     "source.fixAll.oxc": "always"
   },
   "files.associations": {
-    "home/dot_config/mise/tasks/sync-completions": "typescript"
+    "home/dot_config/mise/tasks/executable_sync-completions": "typescript"
   },
   "deno.enable": true
 }
