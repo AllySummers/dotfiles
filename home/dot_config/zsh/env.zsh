@@ -26,7 +26,6 @@ export MISE_TRUSTED_CONFIG_PATHS="${MISE_TRUSTED_CONFIG_PATHS:-$MISE_CONFIG_DIR/
 export LANG="${LANG:-en_US.UTF-8}"
 export LC_ALL="${LC_ALL:-en_US.UTF-8}"
 export EDITOR="${EDITOR:-hx}"
-export VISUAL="${VISUAL:-$EDITOR}"
 export PAGER="${PAGER:-bat}"
 export LESS="${LESS:--R}"
 export FX_SHOW_SIZE=true
@@ -96,15 +95,7 @@ fi
 
 unset homebrew_prefix
 
-if [[ "${VSCODE_GIT_ASKPASS_MAIN:-}" == *Cursor.app* || "${TERM_PROGRAM:l}" == cursor ]]; then
-  export VISUAL=cursor
-elif [[ "${TERM_PROGRAM:l}" == vscode ]]; then
-  if [[ "${VSCODE_GIT_ASKPASS_MAIN:-}" == *insiders* ]]; then
-    export VISUAL=code-insiders
-  else
-    export VISUAL=code
-  fi
-fi
+source "$ZSH_CONFIG_DIR/editors.zsh"
 
 if [[ -z "${BROWSER:-}" ]]; then
   if command -v open >/dev/null 2>&1; then

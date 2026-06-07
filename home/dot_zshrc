@@ -6,6 +6,7 @@ autoload -Uz colors add-zsh-hook compinit bashcompinit
 colors
 
 source "$ZSH_CONFIG_DIR/options.zsh"
+source "$ZSH_CONFIG_DIR/editors.zsh"
 
 case "$OSTYPE" in
   darwin*) export SHELDON_PROFILE="${SHELDON_PROFILE:-macos}" ;;
