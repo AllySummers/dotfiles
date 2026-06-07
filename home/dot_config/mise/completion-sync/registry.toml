@@ -78,6 +78,8 @@ syft = "standard"
 trivy = "standard"
 
 # Dev tools
+ast-grep = "standard"
+aube = "standard"
 chezmoi = "standard"
 crush = "standard"
 cue = "standard"
@@ -88,6 +90,7 @@ fnox = "standard"
 gitleaks = "standard"
 golangci-lint = "standard"
 goreleaser = "standard"
+hk = "standard"
 hugo = "standard"
 lazygit = "standard"
 lefthook = "standard"
@@ -120,6 +123,24 @@ cargo = { zsh = "rustup completions zsh cargo", bash = "rustup completions bash 
 
 # pipx uses argcomplete
 pipx = { zsh = "register-python-argcomplete pipx", bash = "register-python-argcomplete pipx" }
+
+# node has bash only
+node = { bash = "node --completion-bash" }
+
+# sheldon uses --shell flag
+sheldon = { zsh = "sheldon completions --shell zsh", bash = "sheldon completions --shell bash", fish = "sheldon completions --shell fish" }
+
+# gt (graphite-cli) uses different command for fish
+gt = { zsh = "gt completion", bash = "gt completion", fish = "gt fish" }
+
+# fx uses --comp flag
+fx = { zsh = "fx --comp zsh", bash = "fx --comp bash", fish = "fx --comp fish" }
+
+# pkl uses shell-completion subcommand
+pkl = { zsh = "pkl shell-completion zsh", bash = "pkl shell-completion bash", fish = "pkl shell-completion fish" }
+
+# qsv has no completion command; curl pre-generated files from the repo
+qsv = { zsh = "curl -fsSL https://raw.githubusercontent.com/dathere/qsv/master/contrib/completions/examples/qsv.zsh", bash = "curl -fsSL https://raw.githubusercontent.com/dathere/qsv/master/contrib/completions/examples/qsv.bash", fish = "curl -fsSL https://raw.githubusercontent.com/dathere/qsv/master/contrib/completions/examples/qsv.fish" }
 
 prek = { zsh = "prek util generate-shell-completion zsh", bash = "prek util generate-shell-completion bash", fish = "prek util generate-shell-completion fish" }
 
