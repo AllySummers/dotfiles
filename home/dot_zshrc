@@ -6,11 +6,23 @@ autoload -Uz colors add-zsh-hook compinit bashcompinit
 colors
 
 source "$ZSH_CONFIG_DIR/options.zsh"
+source "$ZSH_CONFIG_DIR/bash-ctrl-d.zsh"
 source "$ZSH_CONFIG_DIR/editors.zsh"
 
-case "$OSTYPE" in
-  darwin*) export SHELDON_PROFILE="${SHELDON_PROFILE:-macos}" ;;
-esac
+if [[ -z "${SHELDON_PROFILE:-}" ]]; then
+  case "$OSTYPE" in
+    darwin*)
+      if command -v docker >/dev/null 2>&1; then
+        export SHELDON_PROFILE=macos-docker
+      else
+        export SHELDON_PROFILE=macos
+      fi
+      ;;
+    *)
+      command -v docker >/dev/null 2>&1 && export SHELDON_PROFILE=docker
+      ;;
+  esac
+fi
 
 # First compinit defines compdef for plugins that call it at load time.
 compinit -d "$ZSH_COMPDUMP_FILE"
@@ -27,9 +39,7 @@ source "$ZSH_CONFIG_DIR/aliases.zsh"
 
 eval "$(mise activate zsh)"
 
-if command -v atuin >/dev/null 2>&1; then
-  eval "$(atuin init zsh --disable-up-arrow)"
-fi
+source "$ZSH_CONFIG_DIR/atuin.zsh"
 
 autoload -Uz vcs_info
 zstyle ':vcs_info:git:*' formats ' (%b)'

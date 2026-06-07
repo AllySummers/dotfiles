@@ -41,10 +41,12 @@ dir = "plugins/copypath"
 [plugins.omz-docker]
 github = "ohmyzsh/ohmyzsh"
 dir = "plugins/docker"
+profiles = ["docker", "macos-docker"]
 
 [plugins.omz-docker-compose]
 github = "ohmyzsh/ohmyzsh"
 dir = "plugins/docker-compose"
+profiles = ["docker", "macos-docker"]
 
 [plugins.omz-extract]
 github = "ohmyzsh/ohmyzsh"
@@ -65,7 +67,7 @@ dir = "plugins/gitignore"
 [plugins.omz-macos]
 github = "ohmyzsh/ohmyzsh"
 dir = "plugins/macos"
-profiles = ["macos"]
+profiles = ["macos", "macos-docker"]
 
 [plugins.omz-man]
 github = "ohmyzsh/ohmyzsh"
@@ -88,14 +90,14 @@ apply = ["defer"]
 
 [plugins.zsh-brew-services]
 github = "vasyharan/zsh-brew-services"
-profiles = ["macos"]
+profiles = ["macos", "macos-docker"]
 
 [plugins.zsh-completions]
 github = "clarketm/zsh-completions"
 
 [plugins.mac-zsh-completions]
 github = "scriptingosx/mac-zsh-completions"
-profiles = ["macos"]
+profiles = ["macos", "macos-docker"]
 
 [plugins.jq-zsh-plugin]
 github = "reegnz/jq-zsh-plugin"
