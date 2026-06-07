@@ -7,8 +7,7 @@ experimental = true
 atuin = "18.16.1"
 chezmoi = "2.70.5"
 sheldon = "0.8.5"
-usage = "3.3.0"
-"github:alltuner/mise-completions-sync" = "0.5.9"
+usage = "3.4.0"
 
 # languages & runtimes
 node = "24.16.0"
@@ -57,8 +56,10 @@ pitchfork = "2.12.1"
 "github:sqls-server/sqls" = "0.2.45"
 "npm:dockerfile-language-server-nodejs" = "0.15.0"
 
-[hooks]
-postinstall = ['mise run sync-completions']
+[tasks.sync-completions]
+quiet = true
+file = "git::https://github.com/AllySummers/mise-sync-completions.git//src/sync-completions"
+tools.deno = "2.8.2"
 
-[task_config]
-includes = ["tasks"]
+[hooks]
+postinstall = ["mise run sync-completions"]
