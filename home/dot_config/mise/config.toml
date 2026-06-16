@@ -13,13 +13,12 @@ usage = "latest"
 
 # languages & runtimes
 node = "24.16.0"
-npm = "11.16.0"
+"aqua:npm/cli" = "11.16.0"
 pnpm = "latest"
-deno = 'latest'
+deno = "latest"
 # bun = "latest"
 python = "3.14.5"
 pipx = "latest"
-# uv = "latest"
 # rust = "latest"
 # go = "latest"
 
@@ -49,15 +48,6 @@ pitchfork = "latest"
 "npm:@withgraphite/graphite-cli" = "1.8.6"
 jd = "latest"
 
-# agent lsp stuff
-# "github:blackwell-systems/agent-lsp" = "latest"
-# "npm:typescript-language-server" = "latest"
-# "npm:bash-language-server" = "latest"
-# "npm:yaml-language-server" = "latest"
-# "npm:vscode-langservers-extracted" = "latest"
-# "github:sqls-server/sqls" = "latest"
-# "npm:dockerfile-language-server-nodejs" = "latest"
-
 [tasks.sync-completions]
 quiet = true
 file = "git::https://github.com/AllySummers/mise-sync-completions.git//src/sync-completions"
@@ -65,3 +55,17 @@ tools.deno = "latest"
 
 [hooks]
 postinstall = ["mise run sync-completions --quiet"]
+
+[tasks."ast-grep-mcp"]
+tools."pipx:ast-grep/ast-grep-mcp" = "latest"
+run = "ast-grep-server"
+
+[tasks."agent-lsp-mcp"]
+tools."github:blackwell-systems/agent-lsp" = "latest"
+tools."npm:typescript-language-server" = "latest"
+tools."npm:bash-language-server" = "latest"
+tools."npm:yaml-language-server" = "latest"
+tools."npm:vscode-langservers-extracted" = "latest"
+tools."github:sqls-server/sqls" = "latest"
+tools."npm:dockerfile-language-server-nodejs" = "latest"
+run = "agent-lsp"
