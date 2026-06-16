@@ -44,3 +44,5 @@ else
 fi
 
 alias ssh='TERM="xterm-256color" ssh '
+
+alias pf='pitchfork '
