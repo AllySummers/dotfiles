@@ -1,0 +1,4 @@
+# Loaded by mise on Linux only (requires auto_env = true in config.toml).
+
+[dotfiles]
+"~/.config/Cursor/User/settings.json" = { source = "~/.dotfiles/home/.config/Cursor/User/settings.json.tmpl", mode = "template" }

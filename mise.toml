@@ -13,7 +13,7 @@ auto = true
 experimental = true
 
 [task_config]
-includes = ["tasks", "home/dot_config/mise/tasks"]
+includes = ["tasks", "home/.config/mise/tasks"]
 
 [hooks]
 postinstall = ["hk install --mise", "mise deps install"]

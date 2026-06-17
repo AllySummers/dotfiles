@@ -211,7 +211,7 @@
     }
   },
   "workbench.experimental.share.enabled": true,
-  "mise.binPath": "{{ if eq .chezmoi.os "windows" }}{{ .chezmoi.homeDir | replace "\\" "/" }}/AppData/Local/mise/mise.exe{{ else }}{{ .chezmoi.homeDir }}/.local/bin/mise{{ end }}",
+  "mise.binPath": "{% if os() == "windows" %}{{ env.HOME | replace(from="\\", to="/") }}/AppData/Local/mise/mise.exe{% else %}{{ env.HOME }}/.local/bin/mise{% endif %}",
   "claudeCode.selectedModel": "claude-sonnet-4-6",
   "workbench.editor.enablePreview": false,
   "cursor.inlineDiff.enablePerformanceProtection": false,

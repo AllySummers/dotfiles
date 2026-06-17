@@ -1,6 +1,9 @@
 # Loaded by mise on macOS only (requires auto_env = true in config.toml).
 # Merges with config.toml — brew/brew-cask packages are additive.
 
+[dotfiles]
+"~/Library/Application Support/Cursor/User/settings.json" = { source = "~/.dotfiles/home/.config/Cursor/User/settings.json.tmpl", mode = "template" }
+
 # ── Bootstrap: macOS packages ─────────────────────────────────────────────────
 [bootstrap.packages]
 # Homebrew formulae

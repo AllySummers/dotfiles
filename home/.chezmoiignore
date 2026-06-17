@@ -1,9 +1,0 @@
-{{- if ne .chezmoi.os "darwin" }}
-Library
-{{- end }}
-{{- if ne .chezmoi.os "windows" }}
-AppData
-{{- end }}
-{{- if ne .chezmoi.os "linux" }}
-.config/Cursor
-{{- end }}

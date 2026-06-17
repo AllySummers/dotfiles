@@ -2,16 +2,16 @@
 # Guest-side dotfiles installer. Runs INSIDE a VM or container.
 #
 # 1. Installs git + curl + mise (minimum bootstrap prerequisites).
-# 2. Applies chezmoi to deploy all dotfiles, including the global mise config
-#    (~/.config/mise/config.toml) which declares [bootstrap.*] sections.
-# 3. Runs 'mise bootstrap --yes' from $HOME, which reads the now-deployed
-#    global config and handles the rest:
-#      a. [bootstrap.packages]      — brew formulae, app-only casks, apt/pacman/dnf
-#      b. [bootstrap.macos.*]       — macOS defaults
-#      c. [bootstrap.user]          — login shell (chsh)
-#      d. pre-tools hook            — chezmoi apply (idempotent re-apply)
-#      e. mise install [tools]      — tools from global config
-#      f. [tasks.bootstrap]         — atuin hooks, GUI casks
+# 2. Clones the dotfiles repo to ~/.local/share/dotfiles and seeds a symlink
+#    so the global mise config (~/.config/mise/config.toml) is readable.
+# 3. Runs 'mise bootstrap --yes' from $HOME, which reads the global config
+#    and handles the rest:
+#      a. [bootstrap.packages]  — brew formulae, app-only casks, apt/pacman/dnf
+#      b. [dotfiles] apply      — symlinks and Cursor settings template
+#      c. [bootstrap.macos.*]   — macOS defaults
+#      d. [bootstrap.user]      — login shell (chsh)
+#      e. mise install [tools]  — tools from global config
+#      f. [tasks.bootstrap]     — atuin hooks, GUI casks
 #
 # Usage: ./setup.sh [--repo <url>] [--branch <branch>]
 #
@@ -20,9 +20,9 @@
 #   --branch <branch> Branch to check out (default: repo's default branch).
 #
 # Environment:
-#   DOTFILES_SOURCE   If set to an existing directory, chezmoi uses it as the
-#                     source instead of cloning --repo. Lets you test local
-#                     uncommitted changes inside a VM or container.
+#   DOTFILES_SOURCE   If set to an existing directory, symlinks it as the
+#                     dotfiles root instead of cloning --repo. Lets you test
+#                     local uncommitted changes inside a VM or container.
 
 set -euo pipefail
 
@@ -90,9 +90,9 @@ log "Detected platform: $PLATFORM"
 # ── Ensure ~/.local/bin is on PATH for installers below ───────────────────────
 export PATH="$HOME/.local/bin:$PATH"
 
-# ── Install git + curl (minimum to bootstrap mise and run chezmoi) ────────────
+# ── Install git + curl (minimum to bootstrap mise) ───────────────────────────
 # The full package set is declared in [bootstrap.packages] in the global config
-# and installed by 'mise bootstrap' after chezmoi deploys it.
+# and installed by 'mise bootstrap' after dotfiles are seeded.
 install_prereqs() {
   case "$PLATFORM" in
     macos)
@@ -124,20 +124,31 @@ install_mise() {
   command -v mise >/dev/null 2>&1 && ok "mise $(mise --version)"
 }
 
-# ── Apply dotfiles via chezmoi ────────────────────────────────────────────────
-# This deploys ~/.config/mise/config.toml (with [bootstrap.*] sections) and all
-# other dotfiles. mise bootstrap reads from this global config in the next step.
+# ── Clone/link dotfiles repo ──────────────────────────────────────────────────
+# Seeds ~/.dotfiles and copies the global mise config so that 'mise bootstrap'
+# can read [bootstrap.*] and [dotfiles] in the next step. bootstrap's dotfiles
+# apply step will then replace the copy with a proper symlink (content-identical
+# regular files are converged to symlinks without --force since mise v2026.6.7).
 apply_dotfiles() {
+  DOTFILES_DIR="$HOME/.dotfiles"
+
   if [ -n "${DOTFILES_SOURCE:-}" ] && [ -d "$DOTFILES_SOURCE" ]; then
-    log "Applying dotfiles from local source: $DOTFILES_SOURCE"
-    mise exec chezmoi@latest -- chezmoi init --apply --source "$DOTFILES_SOURCE"
+    log "Linking dotfiles from local source: $DOTFILES_SOURCE"
+    ln -snf "$DOTFILES_SOURCE" "$DOTFILES_DIR"
   else
-    log "Applying dotfiles from repo: $DOTFILES_REPO${DOTFILES_BRANCH:+ (branch: $DOTFILES_BRANCH)}"
-    mise exec chezmoi@latest -- chezmoi init --apply \
-      ${DOTFILES_BRANCH:+--branch "$DOTFILES_BRANCH"} \
-      "$DOTFILES_REPO"
+    if [ -d "$DOTFILES_DIR/.git" ]; then
+      ok "Dotfiles repo already cloned at $DOTFILES_DIR"
+    else
+      log "Cloning dotfiles repo: $DOTFILES_REPO${DOTFILES_BRANCH:+ (branch: $DOTFILES_BRANCH)}"
+      git clone ${DOTFILES_BRANCH:+--branch "$DOTFILES_BRANCH"} "$DOTFILES_REPO" "$DOTFILES_DIR"
+    fi
   fi
-  ok "Dotfiles applied"
+
+  # Seed the global mise config so mise bootstrap can read it.
+  mkdir -p "$HOME/.config/mise"
+  cp "$DOTFILES_DIR/home/.config/mise/config.toml" "$HOME/.config/mise/config.toml"
+  mise trust --yes "$HOME/.config/mise/config.toml"
+  ok "Dotfiles seeded"
 }
 
 install_prereqs
@@ -145,10 +156,9 @@ install_mise
 apply_dotfiles
 
 # ── Run bootstrap from $HOME ──────────────────────────────────────────────────
-# Reads [bootstrap.*] from the now-deployed ~/.config/mise/config.toml.
+# Reads [bootstrap.*] and [dotfiles] from the now-seeded global config.
 log "Running mise bootstrap"
 cd ~
-mise trust --yes "$HOME/.config/mise/config.toml" 2>/dev/null || true
 mise bootstrap --yes
 
 log "Done! Open a new zsh session to use the configured shell."

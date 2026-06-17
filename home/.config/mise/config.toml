@@ -2,11 +2,23 @@
 [settings]
 experimental = true
 auto_env = true
+dotfiles.root = "~/.dotfiles/home"
+dotfiles.default_mode = "symlink"
+
+[dotfiles]
+"~/.zshenv"                      = { mode = "symlink" }
+"~/.zprofile"                    = { mode = "symlink" }
+"~/.zshrc"                       = { mode = "symlink" }
+"~/.gitconfig"                   = { mode = "symlink" }
+"~/.Brewfile"                    = { mode = "symlink" }
+"~/.config/zsh"                  = { mode = "symlink-each" }
+"~/.config/sheldon/plugins.toml" = { mode = "symlink" }
+"~/.config/atuin/config.toml"    = { mode = "symlink" }
+"~/.config/mise/config.toml"     = { mode = "symlink" }
 
 [tools]
 # shell / dotfiles
 atuin = "latest"
-chezmoi = "latest"
 sheldon = "latest"
 usage = "latest"
 # required for some completions
@@ -94,13 +106,6 @@ run = "agent-lsp"
 # ── Bootstrap: user ───────────────────────────────────────────────────────────
 [bootstrap.user]
 login_shell = "/bin/zsh"
-
-# ── Bootstrap hooks ───────────────────────────────────────────────────────────
-# pre-tools: re-apply chezmoi before 'mise install' so dotfiles are always
-# up to date before tools are (re-)installed. On fresh installs setup.sh has
-# already run chezmoi init --apply, so this is an idempotent re-apply.
-[bootstrap.hooks.pre-tools]
-run = "mise exec chezmoi@latest -- chezmoi apply"
 
 # ── Bootstrap task ────────────────────────────────────────────────────────────
 # Orchestrates post-bootstrap steps via depends. Each sub-task is also runnable
