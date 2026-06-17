@@ -1,20 +1,21 @@
 
 [settings]
 experimental = true
-auto_env = true
 dotfiles.root = "~/.dotfiles/home"
 dotfiles.default_mode = "symlink"
 
 [dotfiles]
-"~/.zshenv"                      = { mode = "symlink" }
-"~/.zprofile"                    = { mode = "symlink" }
-"~/.zshrc"                       = { mode = "symlink" }
-"~/.gitconfig"                   = { mode = "symlink" }
-"~/.Brewfile"                    = { mode = "symlink" }
-"~/.config/zsh"                  = { mode = "symlink-each" }
-"~/.config/sheldon/plugins.toml" = { mode = "symlink" }
-"~/.config/atuin/config.toml"    = { mode = "symlink" }
-"~/.config/mise/config.toml"     = { mode = "symlink" }
+"~/.miserc.toml"                         = { mode = "symlink" }
+"~/.zshenv"                              = { mode = "symlink" }
+"~/.zprofile"                            = { mode = "symlink" }
+"~/.zshrc"                               = { mode = "symlink" }
+"~/.gitconfig"                           = { mode = "symlink" }
+"~/.Brewfile"                            = { mode = "symlink" }
+"~/.config/zsh"                          = { mode = "symlink-each" }
+"~/.config/sheldon/plugins.toml"         = { mode = "symlink" }
+"~/.config/atuin/config.toml"            = { mode = "symlink" }
+"~/.config/mise/config.toml"             = { mode = "symlink" }
+"~/.config/mise/config.macos.toml"       = { mode = "symlink" }
 
 [tools]
 # shell / dotfiles

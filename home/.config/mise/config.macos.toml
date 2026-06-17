@@ -5,73 +5,265 @@
 "~/Library/Application Support/Cursor/User/settings.json" = { source = "~/.dotfiles/home/.config/Cursor/User/settings.json.tmpl", mode = "template" }
 
 # ── Bootstrap: macOS packages ─────────────────────────────────────────────────
+# Moved to ~/.Brewfile — mise's brew-cask: backend counts .metadata as a version
+# directory, causing spurious "multiple Caskroom versions found" warnings on every
+# `mise install`. Managing via brew bundle avoids this until the bug is fixed.
+# To re-enable, uncomment below and remove the entries from ~/.Brewfile.
 [bootstrap.packages]
-# Homebrew formulae
-"brew:bash" = "latest"
-"brew:binutils" = "latest"
-"brew:calc" = "latest"
-"brew:coreutils" = "latest"
-"brew:diffutils" = "latest"
-"brew:ed" = "latest"
-"brew:findutils" = "latest"
-"brew:flex" = "latest"
-"brew:gawk" = "latest"
-"brew:glow" = "latest"
-"brew:gnu-sed" = "latest"
-"brew:gnu-tar" = "latest"
-"brew:gnu-which" = "latest"
-"brew:gnupg" = "latest"
-"brew:gpatch" = "latest"
-"brew:grep" = "latest"
-"brew:gzip" = "latest"
-"brew:iperf3" = "latest"
-"brew:less" = "latest"
-"brew:make" = "latest"
-"brew:nano" = "latest"
-"brew:screen" = "latest"
-"brew:watch" = "latest"
-"brew:wdiff" = "latest"
-"brew:wget" = "latest"
-"brew:zip" = "latest"
-"brew:zsh" = "latest"
-# App-only casks (safe for mise's brew-cask: backend).
-# Casks with binary/pkg/preflight artifacts remain in ~/.Brewfile.
-"brew-cask:1password@beta" = "latest"
-"brew-cask:alt-tab" = "latest"
-"brew-cask:betterdisplay" = "latest"
-"brew-cask:bettertouchtool" = "latest"
-"brew-cask:chatgpt" = "latest"
-"brew-cask:discord" = "latest"
-"brew-cask:google-chrome" = "latest"
-"brew-cask:google-chrome@canary" = "latest"
-"brew-cask:kitty" = "latest"
-"brew-cask:lastpass" = "latest"
-"brew-cask:linearmouse" = "latest"
-"brew-cask:shottr" = "latest"
-"brew-cask:spotify" = "latest"
+# # Homebrew formulae
+# "brew:bash" = "latest"
+# "brew:binutils" = "latest"
+# "brew:calc" = "latest"
+# "brew:coreutils" = "latest"
+# "brew:diffutils" = "latest"
+# "brew:ed" = "latest"
+# "brew:findutils" = "latest"
+# "brew:flex" = "latest"
+# "brew:gawk" = "latest"
+# "brew:glow" = "latest"
+# "brew:gnu-sed" = "latest"
+# "brew:gnu-tar" = "latest"
+# "brew:gnu-which" = "latest"
+# "brew:gnupg" = "latest"
+# "brew:gpatch" = "latest"
+# "brew:grep" = "latest"
+# "brew:gzip" = "latest"
+# "brew:iperf3" = "latest"
+# "brew:less" = "latest"
+# "brew:make" = "latest"
+# "brew:nano" = "latest"
+# "brew:screen" = "latest"
+# "brew:watch" = "latest"
+# "brew:wdiff" = "latest"
+# "brew:wget" = "latest"
+# "brew:zip" = "latest"
+# "brew:zsh" = "latest"
+# # Casks
+# "brew-cask:1password@beta" = "latest"
+# "brew-cask:alt-tab" = "latest"
+# "brew-cask:bettertouchtool" = "latest"
+# "brew-cask:chatgpt" = "latest"
+# "brew-cask:discord" = "latest"
+# "brew-cask:google-chrome" = "latest"
+# "brew-cask:google-chrome@canary" = "latest"
+# "brew-cask:kitty" = "latest"
+# "brew-cask:lastpass" = "latest"
+# "brew-cask:linearmouse" = "latest"
+# "brew-cask:shottr" = "latest"
+# "brew-cask:spotify" = "latest"
 
 # ── Bootstrap: macOS defaults ─────────────────────────────────────────────────
 # Check drift with: mise bootstrap macos-defaults status
+
 [bootstrap.macos.defaults.NSGlobalDomain]
+# Save / print panels
+NSNavPanelExpandedStateForSaveMode = true
+NSNavPanelExpandedStateForSaveMode2 = true
+PMPrintingExpandedStateForPrint = true
+PMPrintingExpandedStateForPrint2 = true
+# iCloud
+NSDocumentSaveNewDocumentsToCloud = false
+# App lifecycle
+NSDisableAutomaticTermination = true
+# Appearance
+AppleInterfaceStyle = "Dark"
 AppleShowAllExtensions = true
+AppleShowScrollBars = "Always"
+# Scrolling / navigation gestures
+"com.apple.swipescrolldirection" = false
+AppleEnableSwipeNavigateWithScrolls = false
+# Keyboard
+AppleKeyboardUIMode = 3
+"com.apple.keyboard.fnState" = true
 ApplePressAndHoldEnabled = false
-KeyRepeat = 2
-InitialKeyRepeat = 15
+KeyRepeat = 6
+InitialKeyRepeat = 35
+# Locale / language
+# AppleLanguages is an array type — not supported in mise defaults; set via hook
+AppleLocale = "en_US@rg=auzzzz"
+AppleMeasurementUnits = "Centimeters"
+AppleMetricUnits = true
+AKLastLocale = "en_US@rg=auzzzz"
+# Window / tab behaviour
+AppleWindowTabbingMode = "always"
+# Autocorrect / typing intelligence
+NSAutomaticCapitalizationEnabled = false
+NSAutomaticPeriodSubstitutionEnabled = 0
+NSAutomaticDashSubstitutionEnabled = false
+NSAutomaticQuoteSubstitutionEnabled = false
+NSAutomaticSpellingCorrectionEnabled = false
+NSAutomaticInlinePredictionEnabled = false
+WebAutomaticSpellingCorrectionEnabled = false
+# Spring loading
+"com.apple.springing.enabled" = true
+"com.apple.springing.delay" = 0.0
+# Font rendering
+AppleFontSmoothing = 1
+# Trackpad force click (global pref)
+"com.apple.trackpad.forceClick" = false
 
 [bootstrap.macos.defaults."com.apple.dock"]
-autohide = true
-tilesize = 48
+autohide = false
+tilesize = 36.0
 show-recents = false
+minimize-to-application = true
+show-process-indicators = true
+enterMissionControlByTopWindowDrag = false
+# Hot corner: bottom-right → Quick Note
+wvous-br-corner = 14
+wvous-br-modifier = 0
 
 [bootstrap.macos.defaults."com.apple.finder"]
+QuitMenuItem = true
 ShowPathbar = true
 ShowStatusBar = true
-FXPreferNewFolderAction = true
+AppleShowAllFiles = true
+ShowExternalHardDrivesOnDesktop = true
+ShowMountedServersOnDesktop = true
+ShowRemovableMediaOnDesktop = true
+_FXShowPosixPathInTitle = true
+_FXSortFoldersFirst = true
+FXDefaultSearchScope = "SCcf"
 FXEnableExtensionChangeWarning = false
+FXPreferredViewStyle = "Nlsv"
+WarnOnEmptyTrash = false
+OpenWindowForNewRemovableDisk = true
 
 [bootstrap.macos.defaults."com.apple.screencapture"]
 type = "png"
+location = "~/Pictures/macos screenshots"  # ~ not expanded by mise; status shows false "differs" but apply is correct
+target = "file"
+disable-shadow = true
 
+[bootstrap.macos.defaults."com.apple.screensaver"]
+askForPassword = 1
+askForPasswordDelay = 0
+
+[bootstrap.macos.defaults."com.apple.print.PrintingPrefs"]
+"Quit When Finished" = true
+
+[bootstrap.macos.defaults."com.apple.LaunchServices"]
+LSQuarantine = false
+
+[bootstrap.macos.defaults."com.apple.systempreferences"]
+NSQuitAlwaysKeepsWindows = false
+
+[bootstrap.macos.defaults."com.apple.helpviewer"]
+DevMode = true
+
+[bootstrap.macos.defaults."com.apple.SoftwareUpdate"]
+AutomaticCheckEnabled = true
+ScheduleFrequency = 1
+AutomaticDownload = 1
+CriticalUpdateInstall = 1
+ConfigDataInstall = 1
+
+[bootstrap.macos.defaults."com.apple.commerce"]
+AutoUpdate = true
+AutoUpdateRestartRequired = false
+
+[bootstrap.macos.defaults."com.apple.appstore"]
+WebKitDeveloperExtras = true
+ShowDebugMenu = true
+
+[bootstrap.macos.defaults."com.apple.BluetoothAudioAgent"]
+"Apple Bitpool Min (editable)" = 40
+
+[bootstrap.macos.defaults."com.apple.NetworkBrowser"]
+BrowseAllInterfaces = true
+
+[bootstrap.macos.defaults."com.apple.desktopservices"]
+DSDontWriteNetworkStores = true
+DSDontWriteUSBStores = true
+
+[bootstrap.macos.defaults."com.apple.frameworks.diskimages"]
+skip-verify = true
+skip-verify-locked = true
+skip-verify-remote = true
+auto-open-ro-root = true
+auto-open-rw-root = true
+
+[bootstrap.macos.defaults."com.apple.Safari"]
+IncludeDevelopMenu = true
+WebKitDeveloperExtrasEnabledPreferenceKey = true
+"WebKitPreferences.developerExtrasEnabled" = true
+AutoOpenSafeDownloads = false
+
+[bootstrap.macos.defaults."com.apple.terminal"]
+SecureKeyboardEntry = true
+ShowLineMarks = 0
+
+[bootstrap.macos.defaults."com.apple.TimeMachine"]
+DoNotOfferNewDisksForBackup = true
+
+[bootstrap.macos.defaults."com.apple.ActivityMonitor"]
+OpenMainWindow = true
+IconType = 5
+ShowCategory = 100
+SortColumn = "CPUUsage"
+SortDirection = 0
+
+[bootstrap.macos.defaults."com.apple.AppleMultitouchTrackpad"]
+Clicking = true
+ForceSuppressed = true
+ActuateDetents = 0
+TrackpadPinch = 0
+TrackpadRotate = 0
+TrackpadTwoFingerDoubleTapGesture = 0
+
+[bootstrap.macos.defaults."com.apple.driver.AppleBluetoothMultitouch.trackpad"]
+Clicking = true
+TrackpadPinch = 0
+TrackpadRotate = 0
+TrackpadTwoFingerDoubleTapGesture = 0
+
+[bootstrap.macos.defaults."com.apple.WindowManager"]
+EnableStandardClickToShowDesktop = false
+StandardHideWidgets = 1
+EnableTiledWindowMargins = false
+
+[bootstrap.macos.defaults."com.apple.spaces"]
+spans-displays = true
+
+# ── Bootstrap: hooks ──────────────────────────────────────────────────────────
+[bootstrap.hooks.post-defaults]
+run = [
+  "mkdir -p \"$HOME/Pictures/macos screenshots\"",
+  "defaults write com.apple.screencapture location -string \"$HOME/Pictures/macos screenshots\"",
+  "defaults write NSGlobalDomain AppleLanguages -array 'en-US'",
+  "defaults -currentHost write com.apple.ImageCapture disableHotPlug -bool true",
+  "chflags nohidden ~/Library && xattr -d com.apple.FinderInfo ~/Library 2>/dev/null || true",
+  "/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -kill -r -domain local -domain system -domain user",
+  "launchctl unload -w /System/Library/LaunchAgents/com.apple.notificationcenterui.plist 2>/dev/null || true",
+  "launchctl unload -w /System/Library/LaunchAgents/com.apple.rcd.plist 2>/dev/null || true",
+  "killall Dock || true",
+  "killall Finder || true",
+  "killall SystemUIServer || true",
+]
+
+# ── Bootstrap: system-level settings (requires sudo) ─────────────────────────
+# Run manually: mise run bootstrap:macos-system
+# These cannot be expressed declaratively — they use nvram, pmset, systemsetup,
+# sudo defaults write to system paths, and mdutil.
+[tasks."bootstrap:macos-system"]
+description = "Apply system-level macOS settings (requires sudo)"
+run = """
+sudo nvram SystemAudioVolume=" "
+sudo systemsetup -settimezone "Australia/Sydney" > /dev/null
+sudo pmset -a displaysleep 15
+sudo pmset -a standbydelay 86400
+sudo systemsetup -setcomputersleep Off > /dev/null
+sudo pmset -a hibernatemode 0
+sudo pmset -c sleep 0
+sudo pmset -b sleep 10
+sudo defaults write /Library/Preferences/com.apple.windowserver DisplayResolutionEnabled -bool true
+sudo defaults write /.Spotlight-V100/VolumeConfiguration Exclusions -array "/Volumes"
+sudo mdutil -i on / > /dev/null
+sudo mdutil -E / > /dev/null
+sudo chflags nohidden /Volumes
+"""
+
+# ── Bootstrap: macOS GUI casks via Homebrew ───────────────────────────────────
 # Casks with binary/pkg/preflight artifacts that brew-cask: can't handle.
 # Installs Homebrew first if not already present.
 [tasks."bootstrap:gui"]
