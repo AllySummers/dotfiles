@@ -1,0 +1,76 @@
+# Loaded by mise on macOS only (requires auto_env = true in config.toml).
+# Merges with config.toml — brew/brew-cask packages are additive.
+
+# ── Bootstrap: macOS packages ─────────────────────────────────────────────────
+[bootstrap.packages]
+# Homebrew formulae
+"brew:bash" = "latest"
+"brew:binutils" = "latest"
+"brew:calc" = "latest"
+"brew:coreutils" = "latest"
+"brew:diffutils" = "latest"
+"brew:ed" = "latest"
+"brew:findutils" = "latest"
+"brew:flex" = "latest"
+"brew:gawk" = "latest"
+"brew:glow" = "latest"
+"brew:gnu-sed" = "latest"
+"brew:gnu-tar" = "latest"
+"brew:gnu-which" = "latest"
+"brew:gnupg" = "latest"
+"brew:gpatch" = "latest"
+"brew:grep" = "latest"
+"brew:gzip" = "latest"
+"brew:iperf3" = "latest"
+"brew:less" = "latest"
+"brew:make" = "latest"
+"brew:nano" = "latest"
+"brew:screen" = "latest"
+"brew:watch" = "latest"
+"brew:wdiff" = "latest"
+"brew:wget" = "latest"
+"brew:zip" = "latest"
+"brew:zsh" = "latest"
+# App-only casks (safe for mise's brew-cask: backend).
+# Casks with binary/pkg/preflight artifacts remain in ~/.Brewfile.
+"brew-cask:1password@beta" = "latest"
+"brew-cask:alt-tab" = "latest"
+"brew-cask:betterdisplay" = "latest"
+"brew-cask:bettertouchtool" = "latest"
+"brew-cask:chatgpt" = "latest"
+"brew-cask:discord" = "latest"
+"brew-cask:google-chrome" = "latest"
+"brew-cask:google-chrome@canary" = "latest"
+"brew-cask:kitty" = "latest"
+"brew-cask:lastpass" = "latest"
+"brew-cask:linearmouse" = "latest"
+"brew-cask:shottr" = "latest"
+"brew-cask:spotify" = "latest"
+
+# ── Bootstrap: macOS defaults ─────────────────────────────────────────────────
+# Check drift with: mise bootstrap macos-defaults status
+[bootstrap.macos.defaults.NSGlobalDomain]
+AppleShowAllExtensions = true
+ApplePressAndHoldEnabled = false
+KeyRepeat = 2
+InitialKeyRepeat = 15
+
+[bootstrap.macos.defaults."com.apple.dock"]
+autohide = true
+tilesize = 48
+show-recents = false
+
+[bootstrap.macos.defaults."com.apple.finder"]
+ShowPathbar = true
+ShowStatusBar = true
+FXPreferNewFolderAction = true
+FXEnableExtensionChangeWarning = false
+
+[bootstrap.macos.defaults."com.apple.screencapture"]
+type = "png"
+
+# Casks with binary/pkg/preflight artifacts that brew-cask: can't handle.
+# Installs Homebrew first if not already present.
+[tasks."bootstrap:gui"]
+description = "Install GUI casks via Homebrew"
+run = "HOMEBREW_BUNDLE_NO_LOCK=1 brew bundle --global --no-upgrade"

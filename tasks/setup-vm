@@ -4,7 +4,6 @@
 #USAGE arg "<os>" help="Target OS to test" {
 #USAGE   choices "macos" "arch" "ubuntu" "debian"
 #USAGE }
-#USAGE flag "--gui" help="Install GUI apps (macOS casks)"
 #USAGE flag "--keep" help="Keep the VM/container after the run instead of deleting it"
 #USAGE flag "--ssh" help="Open an interactive shell in the guest after install"
 #USAGE flag "--branch <branch>" help="Branch to check out in the guest (default: repo default)"
@@ -21,7 +20,7 @@
 #   mise run setup-vm ubuntu              # Linux CLI test
 #   mise run setup-vm ubuntu --ssh        # ...then drop into a shell
 #   mise run setup-vm arch                # Arch Linux (x86_64)
-#   mise run setup-vm macos --gui         # macOS VM, also install GUI casks
+#   mise run setup-vm macos               # macOS VM
 #   mise run setup-vm debian --keep       # keep the container around afterwards
 
 set -euo pipefail
@@ -38,7 +37,6 @@ if [ -z "${usage_os:-}" ]; then
 fi
 
 OS="$usage_os"
-INSTALL_GUI="${usage_gui:-false}"
 KEEP="${usage_keep:-false}"
 OPEN_SSH="${usage_ssh:-false}"
 BRANCH="${usage_branch:-}"
@@ -49,7 +47,6 @@ container=""
 
 # Build the flag list passed through to the guest setup.sh.
 SETUP_FLAGS=()
-[ "$INSTALL_GUI" = true ] && SETUP_FLAGS+=(--gui)
 [ -n "$BRANCH" ] && SETUP_FLAGS+=(--branch "$BRANCH")
 
 # ════════════════════════════════════════════════════════════════════════════

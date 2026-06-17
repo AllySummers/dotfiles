@@ -1,6 +1,7 @@
 
 [settings]
 experimental = true
+auto_env = true
 
 [tools]
 # shell / dotfiles
@@ -69,3 +70,51 @@ tools."npm:vscode-langservers-extracted" = "latest"
 tools."github:sqls-server/sqls" = "latest"
 tools."npm:dockerfile-language-server-nodejs" = "latest"
 run = "agent-lsp"
+
+# ── Bootstrap: system packages (Linux) ───────────────────────────────────────
+# brew/brew-cask packages live in config.macos.toml (loaded on macOS only).
+[bootstrap.packages]
+"apt:git" = "latest"
+"apt:curl" = "latest"
+"apt:zsh" = "latest"
+"apt:build-essential" = "latest"
+"apt:ca-certificates" = "latest"
+"pacman:git" = "latest"
+"pacman:curl" = "latest"
+"pacman:zsh" = "latest"
+"pacman:base-devel" = "latest"
+"pacman:ca-certificates" = "latest"
+"dnf:git" = "latest"
+"dnf:curl" = "latest"
+"dnf:zsh" = "latest"
+"dnf:make" = "latest"
+"dnf:gcc" = "latest"
+"dnf:ca-certificates" = "latest"
+
+# ── Bootstrap: user ───────────────────────────────────────────────────────────
+[bootstrap.user]
+login_shell = "/bin/zsh"
+
+# ── Bootstrap hooks ───────────────────────────────────────────────────────────
+# pre-tools: re-apply chezmoi before 'mise install' so dotfiles are always
+# up to date before tools are (re-)installed. On fresh installs setup.sh has
+# already run chezmoi init --apply, so this is an idempotent re-apply.
+[bootstrap.hooks.pre-tools]
+run = "mise exec chezmoi@latest -- chezmoi apply"
+
+# ── Bootstrap task ────────────────────────────────────────────────────────────
+# Orchestrates post-bootstrap steps via depends. Each sub-task is also runnable
+# independently (e.g. 'mise run bootstrap:gui' to reinstall GUI casks alone).
+# sync-completions is NOT called here — the existing postinstall hook already
+# runs it automatically when 'mise bootstrap' installs tools.
+[tasks.bootstrap]
+description = "Post-bootstrap machine setup"
+depends = ["bootstrap:*"]
+
+[tasks."bootstrap:atuin-hooks"]
+description = "Install atuin agent hooks (claude-code, codex, pi)"
+run = [
+  'atuin hook install claude-code',
+  'atuin hook install codex',
+  'atuin hook install pi',
+]

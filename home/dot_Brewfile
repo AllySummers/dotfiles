@@ -1,94 +1,22 @@
-# Bourne-Again SHell, a UNIX command interpreter
-brew "bash"
-# GNU binary tools for native development
-brew "binutils"
-# Arbitrary precision calculator
-brew "calc"
-# GNU File, Shell, and Text utilities
-brew "coreutils"
-# File comparison utilities
-brew "diffutils"
-# Classic UNIX line editor
-brew "ed"
-# Collection of GNU find, xargs, and locate
-brew "findutils"
-# Fast Lexical Analyzer, generates Scanners (tokenizers)
-brew "flex"
-# GNU awk utility
-brew "gawk"
-# Render markdown on the CLI
-brew "glow"
-# GNU implementation of the famous stream editor
-brew "gnu-sed"
-# GNU version of the tar archiving utility
-brew "gnu-tar"
-# GNU implementation of which utility
-brew "gnu-which"
-# GNU Privacy Guard (OpenPGP)
-brew "gnupg"
-# Apply a diff file to an original
-brew "gpatch"
-# GNU grep, egrep and fgrep
-brew "grep"
-# Popular GNU data compression program
-brew "gzip"
-# Update of iperf: measures TCP, UDP, and SCTP bandwidth
-brew "iperf3"
-# Pager program similar to more
-brew "less"
-# Utility for directing compilation
-brew "make"
-# Free (GNU) replacement for the Pico text editor
-brew "nano"
-# Terminal multiplexer with VT100/ANSI terminal emulation
-brew "screen"
-# Executes a program periodically, showing output fullscreen
-brew "watch"
-# Display word differences between text files
-brew "wdiff"
-# Internet file retriever
-brew "wget"
-# Compression and file packaging/archive utility
-brew "zip"
-# UNIX shell (command interpreter)
-brew "zsh"
-# Password manager
-cask "1password@beta"
-# Enable Windows-like alt-tab
-cask "alt-tab"
-# Display management tool
-cask "betterdisplay"
-# Tool to customise input devices and automate computer systems
-cask "bettertouchtool"
-# OpenAI's official ChatGPT desktop app
-cask "chatgpt"
-# Write, edit, and chat about your code with AI
+# Casks that require binary, pkg, or preflight install artifacts and therefore
+# cannot be installed by mise's brew-cask: backend. Installed via
+# 'brew bundle --global' inside the [tasks.bootstrap] task (INSTALL_GUI=true).
+#
+# All brew formulae and app-only casks have moved to [bootstrap.packages] in
+# mise.toml (managed by the brew: and brew-cask: backends respectively).
+
+# Write, edit, and chat about your code with AI (app + CLI binary symlink)
 cask "cursor"
-# Command-line agent for Cursor
+# Command-line agent for Cursor (binary only, no .app bundle)
 cask "cursor-cli"
-# Voice and text chat software
-cask "discord"
 # App to build and share containerised applications and microservices
+# (app + many binary symlinks + completions + postflight script)
 cask "docker-desktop"
-# Web browser
+# Web browser (preflight script + app + binary symlink)
 cask "firefox"
-# Cross-platform Git credential storage for multiple hosting providers
+# Cross-platform Git credential storage for multiple hosting providers (pkg installer)
 cask "git-credential-manager"
-# Web browser
-cask "google-chrome"
-# Web browser
-cask "google-chrome@canary"
-# GPU-based terminal emulator
-cask "kitty"
-# Password manager
-cask "lastpass"
-# Customise mouse behavior
-cask "linearmouse"
-# Screenshot measurement and annotation tool
-cask "shottr"
-# Music streaming service
-cask "spotify"
-# Open-source code editor
+# Open-source code editor (app + 'code' binary symlink)
 cask "visual-studio-code"
-# Open-source code editor
+# Insiders build of VS Code (app + 'code-insiders' binary symlink)
 cask "visual-studio-code@insiders"

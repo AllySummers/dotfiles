@@ -1,32 +1,36 @@
 #!/usr/bin/env bash
 # Guest-side dotfiles installer. Runs INSIDE a VM or container.
 #
-# Installs Homebrew (macOS; which provides git), bootstraps mise (via mise.run), installs
-# chezmoi through mise and applies the dotfiles, then runs `mise install` to
-# materialise everything pinned in ~/.config/mise/config.toml (sheldon, etc.).
-# Supports macOS, Arch, Ubuntu and Debian.
+# 1. Installs git + curl + mise (minimum bootstrap prerequisites).
+# 2. Applies chezmoi to deploy all dotfiles, including the global mise config
+#    (~/.config/mise/config.toml) which declares [bootstrap.*] sections.
+# 3. Runs 'mise bootstrap --yes' from $HOME, which reads the now-deployed
+#    global config and handles the rest:
+#      a. [bootstrap.packages]      — brew formulae, app-only casks, apt/pacman/dnf
+#      b. [bootstrap.macos.*]       — macOS defaults
+#      c. [bootstrap.user]          — login shell (chsh)
+#      d. pre-tools hook            — chezmoi apply (idempotent re-apply)
+#      e. mise install [tools]      — tools from global config
+#      f. [tasks.bootstrap]         — atuin hooks, GUI casks
 #
-# Usage: ./setup.sh [--gui] [--repo <url>] [--branch <branch>]
+# Usage: ./setup.sh [--repo <url>] [--branch <branch>]
 #
 # Flags:
-#   --gui             Also install GUI apps (macOS casks via ~/.Brewfile). Off by default.
-#   --repo <url>      Dotfiles git repo to apply (default: the AllySummers/dotfiles repo).
-#   --branch <branch> Branch to check out (default: the repo's default branch).
+#   --repo <url>      Dotfiles git repo (default: AllySummers/dotfiles).
+#   --branch <branch> Branch to check out (default: repo's default branch).
 #
 # Environment:
-#   DOTFILES_SOURCE   If set to a directory, chezmoi uses it as the source instead of
-#                     cloning --repo. Lets you test *local* uncommitted changes.
+#   DOTFILES_SOURCE   If set to an existing directory, chezmoi uses it as the
+#                     source instead of cloning --repo. Lets you test local
+#                     uncommitted changes inside a VM or container.
 
 set -euo pipefail
 
 DOTFILES_REPO="${DOTFILES_REPO:-https://github.com/AllySummers/dotfiles.git}"
-DOTFILES_SOURCE="${DOTFILES_SOURCE:-}"
 DOTFILES_BRANCH="${DOTFILES_BRANCH:-}"
-INSTALL_GUI=false
 
 while [ "$#" -gt 0 ]; do
   case "$1" in
-    --gui)     INSTALL_GUI=true; shift ;;
     --repo)    DOTFILES_REPO="$2"; shift 2 ;;
     --branch)  DOTFILES_BRANCH="$2"; shift 2 ;;
     *) echo "Unknown argument: $1" >&2; exit 1 ;;
@@ -69,7 +73,7 @@ case "$(uname -s)" in
         debian) PLATFORM="debian" ;;
         *)
           case " ${ID_LIKE:-} " in
-            *arch*)   PLATFORM="arch" ;;
+            *arch*)            PLATFORM="arch" ;;
             *debian*|*ubuntu*) PLATFORM="debian" ;;
             *) echo "Unsupported Linux distro: ${ID:-unknown}" >&2; exit 1 ;;
           esac
@@ -86,33 +90,25 @@ log "Detected platform: $PLATFORM"
 # ── Ensure ~/.local/bin is on PATH for installers below ───────────────────────
 export PATH="$HOME/.local/bin:$PATH"
 
-# ── Install base prerequisites per platform ───────────────────────────────────
+# ── Install git + curl (minimum to bootstrap mise and run chezmoi) ────────────
+# The full package set is declared in [bootstrap.packages] in the global config
+# and installed by 'mise bootstrap' after chezmoi deploys it.
 install_prereqs() {
   case "$PLATFORM" in
     macos)
-      if ! command -v brew >/dev/null 2>&1; then
-        log "Installing Homebrew"
-        NONINTERACTIVE=1 /bin/bash -c \
-          "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-      fi
-      eval "$(/opt/homebrew/bin/brew shellenv)"
-      ok "brew $(brew --version | head -1)"
+      # curl and git ship with macOS; nothing extra needed here.
       ;;
     arch)
-      log "Installing base packages (pacman)"
       # Pacman 7's downloader runs in a seccomp + landlock sandbox that the kernel
-      # can't apply inside Docker (and especially under QEMU/Rosetta emulation),
-      # so pacman aborts with "restricting syscalls via seccomp" / landlock errors.
+      # can't apply inside Docker (especially under QEMU/Rosetta emulation).
       # Disable it when running inside a container (/.dockerenv exists in Docker).
       pac_flags=()
       [ -f /.dockerenv ] && pac_flags+=(--disable-sandbox)
-      $SUDO pacman -Sy --needed --noconfirm "${pac_flags[@]}" git curl zsh base-devel ca-certificates
+      $SUDO pacman -Sy --needed --noconfirm "${pac_flags[@]}" git curl ca-certificates
       ;;
     ubuntu|debian)
-      log "Installing base packages (apt)"
       $SUDO apt-get update -y
-      DEBIAN_FRONTEND=noninteractive $SUDO apt-get install -y \
-        git curl zsh build-essential ca-certificates
+      DEBIAN_FRONTEND=noninteractive $SUDO apt-get install -y git curl ca-certificates
       ;;
   esac
 }
@@ -128,83 +124,31 @@ install_mise() {
   command -v mise >/dev/null 2>&1 && ok "mise $(mise --version)"
 }
 
-# ── Install chezmoi (via mise) ────────────────────────────────────────────────
-install_chezmoi() {
-  # chezmoi is managed by mise like everything else, but it has to exist BEFORE
-  # the dotfiles — and therefore the full mise.toml — are applied. So install
-  # just chezmoi up front and run it via `mise exec`. We deliberately avoid
-  # `mise use -g chezmoi`, which would write chezmoi into the global mise config
-  # that the dotfiles own and chezmoi itself lays down.
-  log "Installing chezmoi (mise)"
-  mise install chezmoi
-  ok "chezmoi $(mise exec chezmoi -- chezmoi --version | head -1)"
-}
-
-# ── Apply dotfiles ─────────────────────────────────────────────────────────────
+# ── Apply dotfiles via chezmoi ────────────────────────────────────────────────
+# This deploys ~/.config/mise/config.toml (with [bootstrap.*] sections) and all
+# other dotfiles. mise bootstrap reads from this global config in the next step.
 apply_dotfiles() {
-  if [ -n "$DOTFILES_SOURCE" ] && [ -d "$DOTFILES_SOURCE" ]; then
+  if [ -n "${DOTFILES_SOURCE:-}" ] && [ -d "$DOTFILES_SOURCE" ]; then
     log "Applying dotfiles from local source: $DOTFILES_SOURCE"
-    mise exec chezmoi -- chezmoi init --apply --source "$DOTFILES_SOURCE"
+    mise exec chezmoi@latest -- chezmoi init --apply --source "$DOTFILES_SOURCE"
   else
     log "Applying dotfiles from repo: $DOTFILES_REPO${DOTFILES_BRANCH:+ (branch: $DOTFILES_BRANCH)}"
-    mise exec chezmoi -- chezmoi init --apply \
+    mise exec chezmoi@latest -- chezmoi init --apply \
       ${DOTFILES_BRANCH:+--branch "$DOTFILES_BRANCH"} \
       "$DOTFILES_REPO"
   fi
   ok "Dotfiles applied"
 }
 
-# ── Materialise pinned tools from the applied mise.toml (sheldon, etc.) ────────
-install_tools() {
-  log "Installing pinned tools via mise (this can take a while)"
-  mise trust --yes "$HOME/.config/mise/config.toml" 2>/dev/null || true
-  # Ensure $SHELL is set so post-install hooks (e.g. bun's completion generator)
-  # know the target shell — it may be unset in bare container environments.
-  export SHELL="${SHELL:-$(command -v zsh || command -v bash)}"
-  mise install --yes
-  # misecompsync's postinstall hook skips mise itself (it's not a pinned tool).
-  # Sync it explicitly so _mise lands in the completions fpath directory.
-  misecompsync mise 2>/dev/null || true
-  ok "Tools installed"
-}
-
-# ── Atuin agent hooks (claude-code, codex, pi) ───────────────────────────────
-install_atuin_hooks() {
-  if ! command -v atuin >/dev/null 2>&1; then
-    warn "atuin not found — skipping agent hook install"
-    return
-  fi
-  log "Installing atuin agent hooks"
-  for agent in claude-code codex pi; do
-    atuin hook install "$agent" 2>/dev/null && ok "atuin hook: $agent" || true
-  done
-}
-
-# ── GUI apps (opt-in, macOS only) ─────────────────────────────────────────────
-install_gui() {
-  if [ "$INSTALL_GUI" != true ]; then
-    log "Skipping GUI apps (pass --gui to enable)"
-    return
-  fi
-  if [ "$PLATFORM" != "macos" ]; then
-    warn "GUI app install is only wired up for macOS — skipping on $PLATFORM"
-    return
-  fi
-  if [ -f "$HOME/.Brewfile" ]; then
-    log "Installing GUI apps from ~/.Brewfile"
-    HOMEBREW_BUNDLE_NO_LOCK=1 brew bundle --global --no-upgrade
-    ok "GUI apps installed"
-  else
-    warn "No ~/.Brewfile found — nothing to install"
-  fi
-}
-
 install_prereqs
 install_mise
-install_chezmoi
 apply_dotfiles
-install_tools
-install_atuin_hooks
-install_gui
+
+# ── Run bootstrap from $HOME ──────────────────────────────────────────────────
+# Reads [bootstrap.*] from the now-deployed ~/.config/mise/config.toml.
+log "Running mise bootstrap"
+cd ~
+mise trust --yes "$HOME/.config/mise/config.toml" 2>/dev/null || true
+mise bootstrap --yes
 
 log "Done! Open a new zsh session to use the configured shell."
