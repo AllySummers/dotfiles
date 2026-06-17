@@ -137,7 +137,8 @@ apply_dotfiles() {
     ln -snf "$DOTFILES_SOURCE" "$DOTFILES_DIR"
   else
     if [ -d "$DOTFILES_DIR/.git" ]; then
-      ok "Dotfiles repo already cloned at $DOTFILES_DIR"
+      log "Updating dotfiles repo at $DOTFILES_DIR"
+      git -C "$DOTFILES_DIR" pull --ff-only
     else
       log "Cloning dotfiles repo: $DOTFILES_REPO${DOTFILES_BRANCH:+ (branch: $DOTFILES_BRANCH)}"
       git clone ${DOTFILES_BRANCH:+--branch "$DOTFILES_BRANCH"} "$DOTFILES_REPO" "$DOTFILES_DIR"
