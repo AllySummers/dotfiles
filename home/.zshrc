@@ -30,6 +30,11 @@ bashcompinit -d "$BASH_COMPDUMP_FILE"
 
 eval "$(mise exec -- sheldon source)"
 
+# fast-syntax-highlighting (loaded via zsh-defer) overrides the bracketed-paste
+# widget that OMZ sets up, breaking instant paste. Re-queue it last so it wins
+# after all deferred plugins have loaded.
+zsh-defer -c 'autoload -Uz bracketed-paste-magic && zle -N bracketed-paste bracketed-paste-magic'
+
 # Re-run after sheldon so plugin-provided completions (zsh-completions,
 # mac-zsh-completions, jq, ...) added to fpath get registered.
 compinit -d "$ZSH_COMPDUMP_FILE"

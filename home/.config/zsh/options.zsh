@@ -22,6 +22,23 @@ unsetopt hist_beep
 
 PROMPT_EOL_MARK=''
 
+# zsh-autosuggestions performance knobs (must be set before the plugin loads).
+# BUFFER_MAX_SIZE: skip history scan for long buffers (pastes are almost always
+# longer than this, so no expensive search fires at all).
+# MANUAL_REBIND: don't rebind every widget on each precmd — big perf win.
+ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
+ZSH_AUTOSUGGEST_MANUAL_REBIND=1
+
+# bracketed-paste-magic: only call through the built-in self-insert during paste,
+# skipping zsh-autosuggestions' and other plugins' self-insert wrappers.
+# This is the key setting that kept paste instant in the old config.
+zstyle ':bracketed-paste-magic' active-widgets '.self-*'
+
+# fast-syntax-highlighting: cap token analysis so large pastes don't stall the
+# highlighter. Highlighting still applies, just truncated for very long lines.
+typeset -gA FAST_HIGHLIGHT
+FAST_HIGHLIGHT[max-syntax-tokens]=100
+
 zstyle ':completion:*' list-colors "${(@s.:.)LS_COLORS}"
 zstyle ':completion:*:matches' group 'yes'
 zstyle ':completion:*:options' description 'yes'
