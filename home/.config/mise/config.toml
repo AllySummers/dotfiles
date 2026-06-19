@@ -42,10 +42,10 @@ ripgrep = "latest"
 bat = "latest"
 fzf = "0.73.1"
 hk = "latest"
-fd = "10.4.2"
+fd = "latest"
 aube = "latest"
 jq = "latest"
-yq = "4.53.3"
+yq = "latest"
 fx = "latest"
 qsv = "20.1.0"
 ast-grep = "0.43.0"
@@ -55,17 +55,22 @@ watchexec = "latest"
 
 # dev tools
 gh = "latest"
-# "github:microsoft/apm" = "0.16.0"
+"github:microsoft/apm" = "latest"
 pitchfork = "latest"
 # "npm:typescript" = "6.0.3"
 # "npm:tsx" = "4.22.4"
-"npm:@withgraphite/graphite-cli" = "1.8.6"
+"npm:@withgraphite/graphite-cli" = "latest"
 jd = "latest"
+# "github:git-town/git-town" = "latest"
 
 [tasks.sync-completions]
 quiet = true
 file = "git::https://github.com/AllySummers/mise-sync-completions.git//src/sync-completions"
 tools.deno = "latest"
+
+[shell_alias]
+mi = "mise install "
+gtt = "git-town "
 
 [hooks]
 postinstall = ["mise run sync-completions --quiet"]
@@ -95,6 +100,7 @@ run = "agent-lsp"
 "pacman:git" = "latest"
 "pacman:curl" = "latest"
 "pacman:zsh" = "latest"
+"pacman:git-town" = "latest"
 "pacman:base-devel" = "latest"
 "pacman:ca-certificates" = "latest"
 "dnf:git" = "latest"

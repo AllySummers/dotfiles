@@ -71,6 +71,9 @@ fpath=(
 manpath=(
   "$homebrew_prefix/share/man"
   "/opt/local/man"
+  "/usr/share/man"
+  "/usr/local/man"
+  "/usr/local/share/man"
   $manpath
 )
 
@@ -92,6 +95,13 @@ if [[ ! -d "$homebrew_prefix" ]]; then
   infopath=(${infopath:#"$homebrew_prefix"/*})
   pkg_config_path=(${pkg_config_path:#"$homebrew_prefix"/*})
 fi
+
+manpath=(
+  # need an empty one at the start to not override the system manpath https://askubuntu.com/a/693612
+  # it also needs to be set after the homebrew cleanup part if not on linux
+  "" 
+  $manpath
+)
 
 unset homebrew_prefix
 
