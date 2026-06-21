@@ -228,44 +228,45 @@ spans-displays = true
 # ── Bootstrap: hooks ──────────────────────────────────────────────────────────
 [bootstrap.hooks.post-defaults]
 run = [
-  "mkdir -p \"$HOME/Pictures/macos screenshots\"",
-  "defaults write com.apple.screencapture location -string \"$HOME/Pictures/macos screenshots\"",
-  "defaults write NSGlobalDomain AppleLanguages -array 'en-US'",
+  # "mkdir -p \"$HOME/Pictures/macos screenshots\"",
+  # "defaults write com.apple.screencapture location -string \"$HOME/Pictures/macos screenshots\"", # set by mise
+  "defaults write NSGlobalDomain AppleLanguages -array 'en-US' 'en-AU'",
   "defaults -currentHost write com.apple.ImageCapture disableHotPlug -bool true",
   "chflags nohidden ~/Library && xattr -d com.apple.FinderInfo ~/Library 2>/dev/null || true",
-  "/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -kill -r -domain local -domain system -domain user",
-  "launchctl unload -w /System/Library/LaunchAgents/com.apple.notificationcenterui.plist 2>/dev/null || true",
-  "launchctl unload -w /System/Library/LaunchAgents/com.apple.rcd.plist 2>/dev/null || true",
-  "killall Dock || true",
-  "killall Finder || true",
-  "killall SystemUIServer || true",
+  "/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -r -domain local -domain system -domain user",
+  "launchctl unload -w /System/Library/LaunchAgents/com.apple.notificationcenterui.plist",
+  "launchctl unload -w /System/Library/LaunchAgents/com.apple.rcd.plist",
+  "killall Dock",
+  "killall Finder",
+  "killall SystemUIServer",
 ]
 
 # ── Bootstrap: system-level settings (requires sudo) ─────────────────────────
 # Run manually: mise run bootstrap:macos-system
 # These cannot be expressed declaratively — they use nvram, pmset, systemsetup,
 # sudo defaults write to system paths, and mdutil.
-[tasks."bootstrap:macos-system"]
-description = "Apply system-level macOS settings (requires sudo)"
-run = """
-sudo nvram SystemAudioVolume=" "
-sudo systemsetup -settimezone "Australia/Sydney" > /dev/null
-sudo pmset -a displaysleep 15
-sudo pmset -a standbydelay 86400
-sudo systemsetup -setcomputersleep Off > /dev/null
-sudo pmset -a hibernatemode 0
-sudo pmset -c sleep 0
-sudo pmset -b sleep 10
-sudo defaults write /Library/Preferences/com.apple.windowserver DisplayResolutionEnabled -bool true
-sudo defaults write /.Spotlight-V100/VolumeConfiguration Exclusions -array "/Volumes"
-sudo mdutil -i on / > /dev/null
-sudo mdutil -E / > /dev/null
-sudo chflags nohidden /Volumes
-"""
+# [tasks."bootstrap:macos-system"]
+# description = "Apply system-level macOS settings (requires sudo)"
+# run = """
+# sudo nvram SystemAudioVolume=" "
+# sudo systemsetup -settimezone "Australia/Sydney" > /dev/null
+# sudo pmset -a displaysleep 15
+# sudo pmset -a standbydelay 86400
+# sudo systemsetup -setcomputersleep Off > /dev/null
+# sudo pmset -a hibernatemode 0
+# sudo pmset -c sleep 0
+# sudo pmset -b sleep 10
+# sudo defaults write /Library/Preferences/com.apple.windowserver DisplayResolutionEnabled -bool true
+# sudo defaults write /.Spotlight-V100/VolumeConfiguration Exclusions -array "/Volumes"
+# sudo mdutil -i on / > /dev/null
+# sudo mdutil -E / > /dev/null
+# sudo chflags nohidden /Volumes
+# """
 
 # ── Bootstrap: macOS GUI casks via Homebrew ───────────────────────────────────
 # Casks with binary/pkg/preflight artifacts that brew-cask: can't handle.
 # Installs Homebrew first if not already present.
-[tasks."bootstrap:gui"]
-description = "Install GUI casks via Homebrew"
-run = "HOMEBREW_BUNDLE_NO_LOCK=1 brew bundle --global --no-upgrade"
+
+# [tasks."bootstrap:gui"]
+# description = "Install GUI casks via Homebrew"
+# run = "HOMEBREW_BUNDLE_NO_LOCK=1 brew bundle --global --no-upgrade"
