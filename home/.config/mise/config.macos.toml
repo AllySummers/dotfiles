@@ -234,8 +234,6 @@ run = [
   "defaults -currentHost write com.apple.ImageCapture disableHotPlug -bool true",
   "chflags nohidden ~/Library && xattr -d com.apple.FinderInfo ~/Library 2>/dev/null || true",
   "/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -r -domain local -domain system -domain user",
-  "launchctl unload -w /System/Library/LaunchAgents/com.apple.notificationcenterui.plist",
-  "launchctl unload -w /System/Library/LaunchAgents/com.apple.rcd.plist",
   "killall Dock",
   "killall Finder",
   "killall SystemUIServer",
