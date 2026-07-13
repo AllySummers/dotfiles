@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "hooks": {
+    "preToolUse": [
+      {
+        "command": "hooks/atuin-history.sh",
+        "matcher": "Shell"
+      }
+    ],
+    "postToolUse": [
+      {
+        "command": "hooks/atuin-history.sh",
+        "matcher": "Shell"
+      }
+    ],
+    "postToolUseFailure": [
+      {
+        "command": "hooks/atuin-history.sh",
+        "matcher": "Shell"
+      }
+    ]
+  }
+}

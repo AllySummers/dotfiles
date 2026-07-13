@@ -16,6 +16,10 @@ dotfiles.default_mode = "symlink"
 "~/.config/atuin/config.toml"            = { mode = "symlink" }
 "~/.config/mise/config.toml"             = { mode = "symlink" }
 "~/.config/mise/config.macos.toml"       = { mode = "symlink" }
+# Only these two files are managed here -- ~/.cursor/ holds a lot of Cursor's
+# own app state, so it's deliberately not symlinked as a whole directory.
+"~/.cursor/hooks.json"                   = { mode = "symlink" }
+"~/.cursor/hooks"                        = { mode = "symlink-each" }
 
 [tools]
 # shell / dotfiles
@@ -61,6 +65,8 @@ pitchfork = "latest"
 # "npm:tsx" = "4.22.4"
 "npm:@withgraphite/graphite-cli" = "latest"
 jd = "latest"
+codex = "latest"
+"github:KarnerTh/mermerd" = "latest"
 
 [tools."github:git-town/git-town"]
 version = "latest"
