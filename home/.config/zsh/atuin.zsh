@@ -12,6 +12,37 @@ eval "$(atuin init zsh --disable-up-arrow)"
 
 : "${ATUIN_HISTORY_SEARCH_FILTER_MODE:=global}"
 
+# Atuin's own "$all-user" author filter (and the [search] authors config
+# default) only excludes its hardcoded known-agent list (claude-code, codex,
+# copilot, pi) -- neither actually excludes "cursor" here. Cursor's agent
+# commands are tagged author=cursor by ~/.cursor/hooks/atuin-history.sh (see
+# that script for why), so every interactive surface below filters by this
+# literal username explicitly instead of trusting "$all-user"/config
+# defaults. Confirmed by testing: an unfiltered `atuin search` and the
+# up-arrow's own query both surfaced author=cursor entries despite
+# `[search] authors = ["Ally"]` being set in atuin/config.toml.
+: "${ATUIN_HISTORY_SEARCH_AUTHOR:=$USER}"
+
+# --- Ctrl+R interactive search ------------------------------------------------
+# atuin init's generated __atuin_search_cmd (what Ctrl+R actually calls) passes
+# no --author at all, so it shows every author unfiltered. Wrap it rather than
+# reimplement it, to keep upstream's tmux-popup/bracketed-paste handling intact.
+if (( $+functions[__atuin_search_cmd] )); then
+  functions -c __atuin_search_cmd __atuin_search_cmd_upstream
+  __atuin_search_cmd() {
+    __atuin_search_cmd_upstream --author "$ATUIN_HISTORY_SEARCH_AUTHOR" "$@"
+  }
+fi
+
+# --- zsh-autosuggestions ghost text -------------------------------------------
+# atuin init's generated suggestion strategy hardcodes --author '$all-user',
+# which has the same "cursor" blind spot described above. Override wholesale.
+if (( $+functions[_zsh_autosuggest_strategy_atuin] )); then
+  _zsh_autosuggest_strategy_atuin() {
+    suggestion=$(ATUIN_QUERY="$1" atuin search --cmd-only --author "$ATUIN_HISTORY_SEARCH_AUTHOR" --limit 1 --search-mode prefix 2>/dev/null)
+  }
+fi
+
 typeset -g -i _atuin_history_match_index
 typeset -g _atuin_history_search_result
 typeset -g _atuin_history_search_query
@@ -92,6 +123,7 @@ _atuin_history_do_search() {
     --cmd-only
     --filter-mode "$ATUIN_HISTORY_SEARCH_FILTER_MODE"
     --search-mode prefix
+    --author "$ATUIN_HISTORY_SEARCH_AUTHOR"
     --limit 1
     --offset "$offset"
   )
