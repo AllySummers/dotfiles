@@ -6,6 +6,8 @@ alias hgi='history | rg -i'
 alias mans='mans'
 alias mansearch='mans'
 alias copy='clipcopy'
+alias mr='mise run '
+alias mi='mise install '
 
 alias -g C='| clipcopy'
 alias -g E='| $EDITOR -'
