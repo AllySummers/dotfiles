@@ -103,7 +103,7 @@
   "editor.wrappingIndent": "indent",
   "gitlens.views.commits.files.layout": "tree",
   "terminal.integrated.suggest.enabled": false,
-  "diffEditor.ignoreTrimWhitespace": false,
+  "diffEditor.ignoreTrimWhitespace": true,
   "gitlens.graph.dimMergeCommits": true,
   "github.gitAuthentication": true,
   "workbench.colorTheme": "Default Dark Modern",
@@ -124,8 +124,6 @@
   "playwright.showTrace": false,
   "gitlens.currentLine.enabled": false,
   "gitlens.rebaseEditor.openOnPausedRebase": false,
-  "gitlens.ai.model": "vscode",
-  "gitlens.ai.vscode.model": "copilot:gpt-4.1",
   "chat.tools.terminal.outputLocation": "chat",
   "chat.editing.alwaysSaveWithGeneratedChanges": true,
   "bookmarks.label.suggestion": "suggestWhenSelected",
@@ -229,5 +227,11 @@
     "**/.hg/store/**": true,
     "**/.next/**": true
   },
-  "update.releaseTrack": "dev"
+  "update.releaseTrack": "dev",
+  "yaml.schemaStore.enable": true,
+  "yaml.schemas": {
+    "https://spec.openapis.org/oas/3.2/schema-base/2025-11-23": ["api.yaml"]
+  },
+  "js/ts.experimental.useTsgo": true,
+  "cursor.composer.editorConversationDensity": "detailed"
 }

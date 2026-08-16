@@ -1,10 +1,9 @@
 min_version = "2026.6.6"
 
 [tools]
-deno = "2.8.3"
-hk = "1.48.0"
-usage = "3.5.0"
-pkl = '0.31.1'
+deno = "2.9.5"
+hk = "1.55.0"
+usage = "5.1.0"
 
 [deps.aube]
 auto = true
@@ -16,10 +15,10 @@ experimental = true
 includes = ["tasks", "home/.config/mise/tasks"]
 
 [hooks]
-postinstall = ["hk install --mise", "mise deps install"]
+postinstall = ["hk install --mise --quiet", "mise deps install"]
 
 [shell_alias]
-mr = 'mise tasks run '
+mr = 'mise run '
 mi = 'mise install '
 
 [env]
