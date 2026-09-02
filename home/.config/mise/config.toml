@@ -5,21 +5,21 @@ dotfiles.root = "~/.dotfiles/home"
 dotfiles.default_mode = "symlink"
 
 [dotfiles]
-"~/.miserc.toml"                         = { mode = "symlink" }
-"~/.zshenv"                              = { mode = "symlink" }
-"~/.zprofile"                            = { mode = "symlink" }
-"~/.zshrc"                               = { mode = "symlink" }
-"~/.gitconfig"                           = { mode = "symlink" }
-"~/.Brewfile"                            = { mode = "symlink" }
-"~/.config/zsh"                          = { mode = "symlink-each" }
-"~/.config/sheldon/plugins.toml"         = { mode = "symlink" }
-"~/.config/atuin/config.toml"            = { mode = "symlink" }
-"~/.config/mise/config.toml"             = { mode = "symlink" }
-"~/.config/mise/config.macos.toml"       = { mode = "symlink" }
+"~/.miserc.toml" = { mode = "symlink" }
+"~/.zshenv" = { mode = "symlink" }
+"~/.zprofile" = { mode = "symlink" }
+"~/.zshrc" = { mode = "symlink" }
+"~/.gitconfig" = { mode = "symlink" }
+"~/.Brewfile" = { mode = "symlink" }
+"~/.config/zsh" = { mode = "symlink-each" }
+"~/.config/sheldon/plugins.toml" = { mode = "symlink" }
+"~/.config/atuin/config.toml" = { mode = "symlink" }
+"~/.config/mise/config.toml" = { mode = "symlink" }
+"~/.config/mise/config.macos.toml" = { mode = "symlink" }
 # Only these two files are managed here -- ~/.cursor/ holds a lot of Cursor's
 # own app state, so it's deliberately not symlinked as a whole directory.
-"~/.cursor/hooks.json"                   = { mode = "symlink" }
-"~/.cursor/hooks"                        = { mode = "symlink-each" }
+"~/.cursor/hooks.json" = { mode = "symlink" }
+"~/.cursor/hooks" = { mode = "symlink-each" }
 
 [tools]
 # shell / dotfiles
@@ -31,7 +31,7 @@ usage = "latest"
 
 # languages & runtimes
 node = "24.19.0"
-"aqua:npm/cli" = "11.19.0"
+"aqua:npm/cli" = "11.19.1"
 pnpm = "latest"
 deno = "latest"
 # bun = "latest"
@@ -44,15 +44,15 @@ pipx = "latest"
 delta = "latest"
 ripgrep = "latest"
 bat = "latest"
-fzf = "0.74.2"
+fzf = "0.74.3"
 hk = "latest"
 fd = "latest"
 aube = "latest"
 jq = "latest"
 yq = "latest"
 fx = "latest"
-qsv = "21.1.0"
-ast-grep = "0.45.1"
+qsv = "22.0.1"
+ast-grep = "0.45.3"
 hyperfine = "latest"
 killport = "2.0.2"
 watchexec = "latest"
@@ -67,6 +67,8 @@ pitchfork = "latest"
 jd = "latest"
 codex = "latest"
 "github:KarnerTh/mermerd" = "latest"
+"github:abhinav/git-spice" = "latest"
+lazygit = "latest"
 
 [tools."github:git-town/git-town"]
 version = "latest"
@@ -96,6 +98,56 @@ tools."npm:vscode-langservers-extracted" = "latest"
 tools."github:sqls-server/sqls" = "latest"
 tools."npm:dockerfile-language-server-nodejs" = "latest"
 run = "agent-lsp"
+
+# Converts the current Graphite stack into a native `gh stack` by adopting
+# the existing branches (no new commits). Run it directly (it calls
+# `gt ls --stack` itself) or pipe `gt ls --stack` output into it.
+[tasks."gh-stack:from-graphite"]
+description = "Adopt the current Graphite stack into a native `gh stack` via `gh stack init`"
+run = '''
+#!/usr/bin/env bash
+{% raw %}
+set -euo pipefail
+
+# This task lives in the global mise config, so mise's default task dir is
+# that config's own directory, not wherever `mise run` was invoked from.
+cd "${MISE_ORIGINAL_CWD:-.}"
+
+if [ -t 0 ]; then
+  raw="$(gt ls --stack)"
+else
+  raw="$(cat)"
+fi
+
+# Each stack line ends in "<glyph>  <branch>[ (extra)]"; drop everything
+# before the glyph and, for the trunk line, the trailing parenthetical.
+branches=()
+while IFS= read -r line; do
+  token="$(sed -n 's/.*[◯◉]  *//p' <<<"$line")"
+  [ -z "$token" ] && continue
+  branches+=("${token%% (*}")
+done <<<"$raw"
+
+if [ "${#branches[@]}" -lt 2 ]; then
+  echo "Could not parse a Graphite stack (need at least a trunk + one branch)" >&2
+  exit 1
+fi
+
+# `gt ls --stack` prints top-of-stack first and trunk last; `gh stack init`
+# wants the trunk via --base and the rest bottom-to-top.
+last_index=$((${#branches[@]} - 1))
+trunk="${branches[$last_index]}"
+bottom_to_top=()
+for ((i = last_index - 1; i >= 0; i--)); do
+  bottom_to_top+=("${branches[$i]}")
+done
+
+echo "Base:     $trunk"
+echo "Branches: ${bottom_to_top[*]}"
+
+gh stack init --base "$trunk" "${bottom_to_top[@]}"
+{% endraw %}
+'''
 
 # ── Bootstrap: system packages (Linux) ───────────────────────────────────────
 # brew/brew-cask packages live in config.macos.toml (loaded on macOS only).
@@ -138,3 +190,123 @@ run = [
   'atuin hook install codex',
   'atuin hook install pi',
 ]
+
+
+[tasks."git:remotes"]
+description = "Convert GitHub remotes to SSH or HTTPS"
+usage = '''
+flag "--ssh" help="Convert remotes to git@github.com SSH URLs"
+flag "--https" help="Convert remotes to https://github.com URLs"
+flag "-n --dry-run" help="Show changes without applying them"
+arg "[directory]" help="Repository directory; defaults to the invocation directory"
+'''
+run = '''
+#!/usr/bin/env bash
+{% raw %}
+set -euo pipefail
+
+ssh_requested="${usage_ssh:-false}"
+https_requested="${usage_https:-false}"
+dry_run="${usage_dry_run:-false}"
+
+if [ "$ssh_requested" = "$https_requested" ]; then
+  echo "Specify exactly one of --ssh or --https" >&2
+  exit 2
+fi
+
+if [ "$ssh_requested" = "true" ]; then
+  protocol="ssh"
+else
+  protocol="https"
+fi
+
+invocation_directory="${MISE_ORIGINAL_CWD:-$PWD}"
+repository_directory="${usage_directory:-$invocation_directory}"
+
+# Interpret relative paths relative to where mise was invoked.
+case "$repository_directory" in
+  /*) ;;
+  *) repository_directory="$invocation_directory/$repository_directory" ;;
+esac
+
+repository_root="$(
+  git -C "$repository_directory" rev-parse --show-toplevel 2>/dev/null
+)" || {
+  echo "Not a Git repository: $repository_directory" >&2
+  exit 1
+}
+
+convert_url() {
+  url="$1"
+
+  case "$protocol:$url" in
+    ssh:https://github.com/*)
+      printf 'git@github.com:%s\n' "${url#https://github.com/}"
+      ;;
+    ssh:git@github.com:* | ssh:ssh://git@github.com/*)
+      printf '%s\n' "$url"
+      ;;
+    https:git@github.com:*)
+      printf 'https://github.com/%s\n' "${url#git@github.com:}"
+      ;;
+    https:ssh://git@github.com/*)
+      printf 'https://github.com/%s\n' "${url#ssh://git@github.com/}"
+      ;;
+    https:https://github.com/*)
+      printf '%s\n' "$url"
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+echo "Repository: $repository_root"
+echo "Protocol:   $protocol"
+
+while IFS= read -r remote; do
+  fetch_url="$(git -C "$repository_root" remote get-url "$remote")"
+
+  if converted_fetch_url="$(convert_url "$fetch_url")"; then
+    if [ "$converted_fetch_url" = "$fetch_url" ]; then
+      echo "$remote: already $protocol ($fetch_url)"
+    elif [ "$dry_run" = "true" ]; then
+      echo "$remote: $fetch_url -> $converted_fetch_url"
+    else
+      git -C "$repository_root" remote set-url \
+        "$remote" "$converted_fetch_url"
+      echo "$remote: $fetch_url -> $converted_fetch_url"
+    fi
+  else
+    echo "$remote: skipped unsupported URL ($fetch_url)" >&2
+  fi
+
+  # Convert a separately configured push URL, if one exists.
+  push_url="$(
+    git -C "$repository_root" config --local \
+      --get "remote.$remote.pushurl" 2>/dev/null || true
+  )"
+
+  if [ -n "$push_url" ]; then
+    if converted_push_url="$(convert_url "$push_url")"; then
+      if [ "$converted_push_url" != "$push_url" ]; then
+        if [ "$dry_run" = "true" ]; then
+          echo "$remote push: $push_url -> $converted_push_url"
+        else
+          git -C "$repository_root" remote set-url \
+            --push "$remote" "$converted_push_url"
+          echo "$remote push: $push_url -> $converted_push_url"
+        fi
+      fi
+    else
+      echo "$remote push: skipped unsupported URL ($push_url)" >&2
+    fi
+  fi
+done < <(git -C "$repository_root" remote)
+
+if [ "$dry_run" != "true" ]; then
+  echo
+  git -C "$repository_root" remote -v
+fi
+{% endraw %}
+'''

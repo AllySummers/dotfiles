@@ -30,6 +30,11 @@ bashcompinit -d "$BASH_COMPDUMP_FILE"
 
 eval "$(mise exec -- sheldon source)"
 
+# sheldon prepends each plugin's completion dir, which pushes the override set in
+# options.zsh behind clarketm/zsh-completions. Re-assert it (fpath is typeset -U,
+# so this moves rather than duplicates the entry) before the second compinit.
+fpath=("$ZSH_CONFIG_DIR/completions-override" $fpath)
+
 # fast-syntax-highlighting (loaded via zsh-defer) overrides the bracketed-paste
 # widget that OMZ sets up, breaking instant paste. Re-queue it last so it wins
 # after all deferred plugins have loaded.

@@ -37,3 +37,9 @@
 	helper = /usr/local/share/gcm-core/git-credential-manager
 [credential "https://dev.azure.com"]
 	useHttpPath = true
+[fetch]
+	prune = true
+[commit]
+	gpgsign = true
+[tag]
+	gpgSign = true
