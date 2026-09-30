@@ -3,6 +3,21 @@
 experimental = true
 dotfiles.root = "~/.dotfiles/home"
 dotfiles.default_mode = "symlink"
+auto_update = true
+minimum_release_age_excludes = ["aube", "hk", "pitchfork", "usage", "packslip", "fnox", "deno", "gh"]
+
+# [tool_alias]
+# aube = "packslip:github.com/aubepkg/aube"
+# communique = "packslip:github.com/jdx/communique"
+# fnox = "packslip:github.com/jdx/fnox"
+# hk = "packslip:github.com/jdx/hk"
+# mbx = "packslip:github.com/jdx/mr-boxington"
+# mr-boxington = "packslip:github.com/jdx/mr-boxington"
+# packslip = "packslip:packslip.dev"
+# pitchfork = "packslip:github.com/jdx/pitchfork"
+# timoni = "packslip:github.com/stefanprodan/timoni"
+# usage = "packslip:github.com/jdx/usage"
+# worktrunk = "packslip:github.com/max-sixty/worktrunk"
 
 [dotfiles]
 "~/.miserc.toml" = { mode = "symlink" }
@@ -21,6 +36,8 @@ dotfiles.default_mode = "symlink"
 "~/.cursor/hooks.json" = { mode = "symlink" }
 "~/.cursor/hooks" = { mode = "symlink-each" }
 
+
+
 [tools]
 # shell / dotfiles
 atuin = "latest"
@@ -30,8 +47,8 @@ usage = "latest"
 "pipx:argcomplete" = "latest"
 
 # languages & runtimes
-node = "24.19.0"
-"aqua:npm/cli" = "11.19.1"
+node = "24"
+"aqua:npm/cli" = "12.1.0"
 pnpm = "latest"
 deno = "latest"
 # bun = "latest"
@@ -44,14 +61,14 @@ pipx = "latest"
 delta = "latest"
 ripgrep = "latest"
 bat = "latest"
-fzf = "0.74.3"
+fzf = "0.74.4"
 hk = "latest"
 fd = "latest"
 aube = "latest"
 jq = "latest"
 yq = "latest"
 fx = "latest"
-qsv = "22.0.1"
+qsv = "23.0.1"
 ast-grep = "0.45.3"
 hyperfine = "latest"
 killport = "2.0.2"
@@ -69,9 +86,7 @@ codex = "latest"
 "github:KarnerTh/mermerd" = "latest"
 "github:abhinav/git-spice" = "latest"
 lazygit = "latest"
-
-[tools."github:git-town/git-town"]
-version = "latest"
+"github:git-town/git-town" = "latest"
 
 [tasks.sync-completions]
 quiet = true
