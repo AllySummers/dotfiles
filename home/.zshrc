@@ -49,6 +49,10 @@ source "$ZSH_CONFIG_DIR/aliases.zsh"
 
 eval "$(mise activate zsh)"
 
+# Tab completion for any executable with a `#!/usr/bin/env -S usage bash` shebang.
+# Needs `usage` on PATH (provided by mise) and must run after compinit.
+command -v usage >/dev/null 2>&1 && source <(usage g completion-init zsh)
+
 source "$ZSH_CONFIG_DIR/atuin.zsh"
 
 autoload -Uz vcs_info
