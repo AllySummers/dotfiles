@@ -3,6 +3,7 @@
 experimental = true
 dotfiles.root = "~/.dotfiles/home"
 dotfiles.default_mode = "symlink"
+dotfiles.relative_symlinks = true
 auto_update = true
 minimum_release_age_excludes = ["aube", "hk", "pitchfork", "usage", "packslip", "fnox", "deno", "gh"]
 
@@ -26,7 +27,8 @@ minimum_release_age_excludes = ["aube", "hk", "pitchfork", "usage", "packslip", 
 "~/.zshrc" = { mode = "symlink" }
 "~/.gitconfig" = { mode = "symlink" }
 "~/.Brewfile" = { mode = "symlink" }
-"~/.config/zsh" = { mode = "symlink-each" }
+# manifest = "git" deploys only files tracked in Git's index (git add new files first).
+"~/.config/zsh" = { mode = "symlink-each", manifest = "git" }
 "~/.config/sheldon/plugins.toml" = { mode = "symlink" }
 "~/.config/atuin/config.toml" = { mode = "symlink" }
 "~/.config/mise/config.toml" = { mode = "symlink" }
@@ -34,8 +36,17 @@ minimum_release_age_excludes = ["aube", "hk", "pitchfork", "usage", "packslip", 
 # Only these two files are managed here -- ~/.cursor/ holds a lot of Cursor's
 # own app state, so it's deliberately not symlinked as a whole directory.
 "~/.cursor/hooks.json" = { mode = "symlink" }
-"~/.cursor/hooks" = { mode = "symlink-each" }
+"~/.cursor/hooks" = { mode = "symlink-each", manifest = "git" }
 
+# Cursor settings: one template, per-OS destination.
+[dotfiles."cursor-settings"]
+source = "~/.dotfiles/home/.config/Cursor/User/settings.json.tmpl"
+mode = "template"
+variants = [
+  { os = "macos", target = "~/Library/Application Support/Cursor/User/settings.json" },
+  { os = "linux", target = "~/.config/Cursor/User/settings.json" },
+  { os = "windows", target = "~/AppData/Roaming/Cursor/User/settings.json" },
+]
 
 
 [tools]
@@ -68,7 +79,6 @@ aube = "latest"
 jq = "latest"
 yq = "latest"
 fx = "latest"
-qsv = "23.0.1"
 ast-grep = "0.45.3"
 hyperfine = "latest"
 killport = "2.0.2"
@@ -87,6 +97,10 @@ codex = "latest"
 "github:abhinav/git-spice" = "latest"
 lazygit = "latest"
 "github:git-town/git-town" = "latest"
+
+[tools.qsv]
+version = "23.0.1"
+lazy = true
 
 [tasks.sync-completions]
 quiet = true

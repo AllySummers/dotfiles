@@ -1,9 +1,5 @@
 # Loaded by mise on macOS only (requires auto_env = true in config.toml).
 # Merges with config.toml — brew/brew-cask packages are additive.
-
-[dotfiles]
-"~/Library/Application Support/Cursor/User/settings.json" = { source = "~/.dotfiles/home/.config/Cursor/User/settings.json.tmpl", mode = "template" }
-
 # ── Bootstrap: macOS packages ─────────────────────────────────────────────────
 # Moved to ~/.Brewfile — mise's brew-cask: backend counts .metadata as a version
 # directory, causing spurious "multiple Caskroom versions found" warnings on every
@@ -79,7 +75,7 @@ ApplePressAndHoldEnabled = false
 KeyRepeat = 6
 InitialKeyRepeat = 35
 # Locale / language
-# AppleLanguages is an array type — not supported in mise defaults; set via hook
+AppleLanguages = ["en-US", "en-AU"]
 AppleLocale = "en_US@rg=auzzzz"
 AppleMeasurementUnits = "Centimeters"
 AppleMetricUnits = true
@@ -225,13 +221,17 @@ EnableTiledWindowMargins = false
 [bootstrap.macos.defaults."com.apple.spaces"]
 spans-displays = true
 
+[[bootstrap.macos.defaults_entries]]
+domain = "com.apple.ImageCapture"
+key = "disableHotPlug"
+host = "current"
+value = true
+
 # ── Bootstrap: hooks ──────────────────────────────────────────────────────────
 [bootstrap.hooks.post-defaults]
 run = [
   # "mkdir -p \"$HOME/Pictures/macos screenshots\"",
   # "defaults write com.apple.screencapture location -string \"$HOME/Pictures/macos screenshots\"", # set by mise
-  "defaults write NSGlobalDomain AppleLanguages -array 'en-US' 'en-AU'",
-  "defaults -currentHost write com.apple.ImageCapture disableHotPlug -bool true",
   "chflags nohidden ~/Library && xattr -d com.apple.FinderInfo ~/Library 2>/dev/null || true",
   "/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -r -domain local -domain system -domain user",
   "killall Dock",

@@ -2,8 +2,8 @@
 # Guest-side dotfiles installer. Runs INSIDE a VM or container.
 #
 # 1. Installs git + curl + mise (minimum bootstrap prerequisites).
-# 2. Clones the dotfiles repo to ~/.local/share/dotfiles and seeds a symlink
-#    so the global mise config (~/.config/mise/config.toml) is readable.
+# 2. Clones the dotfiles repo to ~/.dotfiles and seeds ~/.miserc.toml plus the
+#    global mise config (and the macOS platform config) so they are readable.
 # 3. Runs 'mise bootstrap --yes' from $HOME, which reads the global config
 #    and handles the rest:
 #      a. [bootstrap.packages]  — brew formulae, app-only casks, apt/pacman/dnf
@@ -145,11 +145,30 @@ apply_dotfiles() {
     fi
   fi
 
-  # Seed the global mise config so mise bootstrap can read it.
+  # Seed the early-init miserc and the global mise config (plus the platform
+  # config, if any) so mise bootstrap can read them before the dotfiles phase.
   mkdir -p "$HOME/.config/mise"
-  cp "$DOTFILES_DIR/home/.config/mise/config.toml" "$HOME/.config/mise/config.toml"
-  mise trust --yes "$HOME/.config/mise/config.toml"
+  seed_file "$DOTFILES_DIR/home/.miserc.toml" "$HOME/.miserc.toml"
+  seed_file "$DOTFILES_DIR/home/.config/mise/config.toml" "$HOME/.config/mise/config.toml"
+  if [ "$PLATFORM" = "macos" ]; then
+    seed_file "$DOTFILES_DIR/home/.config/mise/config.macos.toml" "$HOME/.config/mise/config.macos.toml"
+  fi
   ok "Dotfiles seeded"
+}
+
+# Copy src to dest only if dest is absent or already identical (never overwrite
+# a differing file), then trust it. The dotfiles phase converges identical
+# copies into symlinks.
+seed_file() {
+  local src="$1" dest="$2"
+  if [ ! -e "$dest" ]; then
+    cp "$src" "$dest"
+  elif ! cmp -s "$src" "$dest"; then
+    warn "Keeping existing $dest (differs from dotfiles)"
+  fi
+  case "$dest" in
+    */.config/mise/*) mise trust --yes "$dest" ;;
+  esac
 }
 
 install_prereqs
