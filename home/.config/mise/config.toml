@@ -1,4 +1,3 @@
-
 [settings]
 experimental = true
 dotfiles.root = "~/.dotfiles/home"
@@ -6,6 +5,7 @@ dotfiles.default_mode = "symlink"
 dotfiles.relative_symlinks = true
 auto_update = true
 minimum_release_age_excludes = ["aube", "hk", "pitchfork", "usage", "packslip", "fnox", "deno", "gh"]
+self_update.minimum_release_age = "1d"
 
 # [tool_alias]
 # aube = "packslip:github.com/aubepkg/aube"
