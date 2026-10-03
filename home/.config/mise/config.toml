@@ -59,11 +59,11 @@ usage = "latest"
 
 # languages & runtimes
 node = "24"
-"aqua:npm/cli" = "12.1.0"
+"aqua:npm/cli" = "12.2.0"
 pnpm = "latest"
 deno = "latest"
 # bun = "latest"
-python = "3.14.7"
+python = "3.14.8"
 pipx = "latest"
 # rust = "latest"
 # go = "latest"
