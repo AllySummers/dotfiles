@@ -22,10 +22,6 @@
 	side-by-side = true
 [diff]
 	colorMoved = default
-# Per-machine signing key, gpgsign, and credential helpers. Create
-# ~/.gitconfig.local on each machine; included last so it overrides.
-[include]
-	path = ~/.gitconfig.local
 [credential "https://github.com"]
 	helper = 
 	helper = !~/.local/share/mise/shims/gh auth git-credential
@@ -43,3 +39,7 @@
 	gpgsign = true
 [tag]
 	gpgSign = true
+# Per-machine signing key, gpgsign, and credential helpers. Create
+# ~/.gitconfig.local on each machine; included last so it overrides.
+[include]
+	path = ~/.gitconfig.local
