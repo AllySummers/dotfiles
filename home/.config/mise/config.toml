@@ -6,19 +6,10 @@ dotfiles.relative_symlinks = true
 auto_update = true
 minimum_release_age_excludes = ["aube", "hk", "pitchfork", "usage", "packslip", "fnox", "deno", "gh"]
 self_update.minimum_release_age = "1d"
+lockfile = true
 
-# [tool_alias]
-# aube = "packslip:github.com/aubepkg/aube"
-# communique = "packslip:github.com/jdx/communique"
-# fnox = "packslip:github.com/jdx/fnox"
-# hk = "packslip:github.com/jdx/hk"
-# mbx = "packslip:github.com/jdx/mr-boxington"
-# mr-boxington = "packslip:github.com/jdx/mr-boxington"
-# packslip = "packslip:packslip.dev"
-# pitchfork = "packslip:github.com/jdx/pitchfork"
-# timoni = "packslip:github.com/stefanprodan/timoni"
-# usage = "packslip:github.com/jdx/usage"
-# worktrunk = "packslip:github.com/max-sixty/worktrunk"
+[env]
+BLACKSMITH_DISABLE_AUTO_UPDATE = "1"
 
 [dotfiles]
 "~/.miserc.toml" = { mode = "symlink" }
@@ -98,6 +89,13 @@ codex = "latest"
 lazygit = "latest"
 "github:git-town/git-town" = "latest"
 tombi = "latest"
+
+
+[tools."http:blacksmith"]
+version = "0.4.46"
+url = 'https://clireleases.blacksmith.sh/cli/v{{ version }}/{{ os(macos="darwin") }}/{{ arch(x64="amd64") }}/blacksmith'
+checksum_url = 'https://clireleases.blacksmith.sh/cli/v{{ version }}/{{ os(macos="darwin") }}/{{ arch(x64="amd64") }}/blacksmith.sha256'
+checksum_expr = '"sha256:" + split(trim(body), " ")[0]'
 
 [tools.qsv]
 version = "23.0.1"
