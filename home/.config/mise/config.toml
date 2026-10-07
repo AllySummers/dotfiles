@@ -89,6 +89,7 @@ codex = "latest"
 lazygit = "latest"
 "github:git-town/git-town" = "latest"
 tombi = "latest"
+1password = "latest"
 
 
 [tools."http:blacksmith"]
@@ -131,10 +132,11 @@ gtt = "git-town "
 login_shell = "/bin/zsh"
 
 [hooks]
-postinstall = ["mise run sync-completions --quiet"]
+postinstall = ['mise run sync-completions --quiet']
 
 [tasks.sync-completions]
 quiet = true
+# file = "repos/mise-sync-completions/src/sync-completions"
 file = "git::https://github.com/AllySummers/mise-sync-completions.git//src/sync-completions"
 tools.deno = "latest"
 
