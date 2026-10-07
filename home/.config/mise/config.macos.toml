@@ -69,13 +69,13 @@ AppleShowScrollBars = "Always"
 "com.apple.swipescrolldirection" = false
 AppleEnableSwipeNavigateWithScrolls = false
 # Keyboard
-AppleKeyboardUIMode = 3
+# AppleKeyboardUIMode = 3 # https://gist.github.com/brandonb927/3195465/#file-osx-for-hackers-sh-L273
+AppleKeyboardUIMode = 2
 "com.apple.keyboard.fnState" = true
 ApplePressAndHoldEnabled = false
 KeyRepeat = 6
 InitialKeyRepeat = 35
 # Locale / language
-AppleLanguages = ["en-US", "en-AU"]
 AppleLocale = "en_US@rg=auzzzz"
 AppleMeasurementUnits = "Centimeters"
 AppleMetricUnits = true
@@ -220,6 +220,12 @@ EnableTiledWindowMargins = false
 
 [bootstrap.macos.defaults."com.apple.spaces"]
 spans-displays = true
+
+# Arrays aren't in the schema for the `defaults` table, so use defaults_entries
+[[bootstrap.macos.defaults_entries]]
+domain = "NSGlobalDomain"
+key = "AppleLanguages"
+value = ["en-US", "en-AU"]
 
 [[bootstrap.macos.defaults_entries]]
 domain = "com.apple.ImageCapture"

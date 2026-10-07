@@ -97,22 +97,48 @@ codex = "latest"
 "github:abhinav/git-spice" = "latest"
 lazygit = "latest"
 "github:git-town/git-town" = "latest"
+tombi = "latest"
 
 [tools.qsv]
 version = "23.0.1"
 lazy = true
 
-[tasks.sync-completions]
-quiet = true
-file = "git::https://github.com/AllySummers/mise-sync-completions.git//src/sync-completions"
-tools.deno = "latest"
-
 [shell_alias]
 mi = "mise install "
 gtt = "git-town "
 
+# ── Bootstrap: system packages (Linux) ───────────────────────────────────────
+# brew/brew-cask packages live in config.macos.toml (loaded on macOS only).
+[bootstrap.packages]
+"apt:git" = "latest"
+"apt:curl" = "latest"
+"apt:zsh" = "latest"
+"apt:build-essential" = "latest"
+"apt:ca-certificates" = "latest"
+"pacman:git" = "latest"
+"pacman:curl" = "latest"
+"pacman:zsh" = "latest"
+# "pacman:git-town" = "latest"
+"pacman:base-devel" = "latest"
+"pacman:ca-certificates" = "latest"
+"dnf:git" = "latest"
+"dnf:curl" = "latest"
+"dnf:zsh" = "latest"
+"dnf:make" = "latest"
+"dnf:gcc" = "latest"
+"dnf:ca-certificates" = "latest"
+
+# ── Bootstrap: user ───────────────────────────────────────────────────────────
+[bootstrap.user]
+login_shell = "/bin/zsh"
+
 [hooks]
 postinstall = ["mise run sync-completions --quiet"]
+
+[tasks.sync-completions]
+quiet = true
+file = "git::https://github.com/AllySummers/mise-sync-completions.git//src/sync-completions"
+tools.deno = "latest"
 
 [tasks."ast-grep-mcp"]
 tools."pipx:ast-grep/ast-grep-mcp" = "latest"
@@ -177,31 +203,6 @@ echo "Branches: ${bottom_to_top[*]}"
 gh stack init --base "$trunk" "${bottom_to_top[@]}"
 {% endraw %}
 '''
-
-# ── Bootstrap: system packages (Linux) ───────────────────────────────────────
-# brew/brew-cask packages live in config.macos.toml (loaded on macOS only).
-[bootstrap.packages]
-"apt:git" = "latest"
-"apt:curl" = "latest"
-"apt:zsh" = "latest"
-"apt:build-essential" = "latest"
-"apt:ca-certificates" = "latest"
-"pacman:git" = "latest"
-"pacman:curl" = "latest"
-"pacman:zsh" = "latest"
-# "pacman:git-town" = "latest"
-"pacman:base-devel" = "latest"
-"pacman:ca-certificates" = "latest"
-"dnf:git" = "latest"
-"dnf:curl" = "latest"
-"dnf:zsh" = "latest"
-"dnf:make" = "latest"
-"dnf:gcc" = "latest"
-"dnf:ca-certificates" = "latest"
-
-# ── Bootstrap: user ───────────────────────────────────────────────────────────
-[bootstrap.user]
-login_shell = "/bin/zsh"
 
 # ── Bootstrap task ────────────────────────────────────────────────────────────
 # Orchestrates post-bootstrap steps via depends. Each sub-task is also runnable

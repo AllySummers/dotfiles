@@ -1,0 +1,33 @@
+[[schemas]]
+path = "https://raw.githubusercontent.com/jdx/mise/refs/tags/v2026.10.3/schema/mise.json"
+include = [
+  "**/mise.toml",
+  "**/.mise.toml",
+  "**/mise.*.toml",
+  "home/.config/mise/config.toml",
+  "home/.config/mise/config.*.toml",
+]
+
+[[schemas]]
+path = "https://raw.githubusercontent.com/jdx/mise/refs/tags/v2026.10.3/schema/mise-task.json"
+include = ["mise-tasks/**/*.toml"]
+
+[[schemas]]
+path = "https://raw.githubusercontent.com/jdx/mise/refs/tags/v2026.10.3/schema/mise-settings.json"
+include = ["**/mise/settings.toml"]
+
+[[schemas]]
+path = "https://raw.githubusercontent.com/jdx/mise/refs/tags/v2026.10.3/schema/mise-registry-tool.json"
+include = ["**/registry/*.toml"]
+
+[[schemas]]
+path = "https://raw.githubusercontent.com/jdx/mise/refs/tags/v2026.10.3/schema/mise.plugin.json"
+include = ["**/mise.plugin.toml"]
+
+[[schemas]]
+path = "https://raw.githubusercontent.com/jdx/mise/refs/tags/v2026.10.3/schema/miserc.json"
+include = ["**/.miserc.toml", "**/miserc.toml"]
+
+[[schemas]]
+path = "https://raw.githubusercontent.com/jdx/mise/refs/tags/v2026.10.3/schema/mise-daemon-preset.json"
+include = ["**/mise-daemon-preset*.toml"]
