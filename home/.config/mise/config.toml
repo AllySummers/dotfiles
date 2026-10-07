@@ -6,7 +6,6 @@ dotfiles.relative_symlinks = true
 auto_update = true
 minimum_release_age_excludes = ["aube", "hk", "pitchfork", "usage", "packslip", "fnox", "deno", "gh"]
 self_update.minimum_release_age = "1d"
-lockfile = true
 
 [env]
 BLACKSMITH_DISABLE_AUTO_UPDATE = "1"
