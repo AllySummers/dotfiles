@@ -64,3 +64,5 @@ precmd_functions+=(precmd_vcs_info)
 PROMPT='%F{green}%~%F{blue}${vcs_info_msg_0_}%f '
 
 export GPG_TTY="$(tty)"
+
+[[ -r "$ZSH_CONFIG_DIR/local-post.zsh" ]] && source "$ZSH_CONFIG_DIR/local-post.zsh"

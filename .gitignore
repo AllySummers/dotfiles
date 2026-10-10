@@ -1,6 +1,7 @@
 .DS_Store
-/home/dot_config/zsh/local.zsh
-/home/dot_config/zsh/secrets.zsh
+/home/.config/zsh/local.zsh
+/home/.config/zsh/local-post.zsh
+/home/.config/zsh/secrets.zsh
 /home/dot_gitconfig.local
 .vscode/settings.json
 node_modules
