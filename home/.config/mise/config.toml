@@ -16,7 +16,6 @@ ENTIRE_TELEMETRY_OPTOUT = true
 "~/.zprofile" = { mode = "symlink" }
 "~/.zshrc" = { mode = "symlink" }
 "~/.gitconfig" = { mode = "symlink" }
-"~/.Brewfile" = { mode = "symlink" }
 # manifest = "git" deploys only files tracked in Git's index (git add new files first).
 "~/.config/zsh" = { mode = "symlink-each", manifest = "git" }
 "~/.config/sheldon/plugins.toml" = { mode = "symlink" }
@@ -56,7 +55,7 @@ deno = "latest"
 python = "3.15.0"
 pipx = "latest"
 # rust = "latest"
-# go = "latest"
+go = "latest"
 
 # cli utilities
 delta = "latest"
@@ -73,6 +72,9 @@ ast-grep = "0.50.0"
 hyperfine = "latest"
 killport = "2.0.2"
 watchexec = "latest"
+glow = "latest"
+difftastic = "latest"
+"github:asciinema/asciinema" = "latest"
 
 # dev tools
 gh = "latest"
@@ -209,7 +211,7 @@ gh stack init --base "$trunk" "${bottom_to_top[@]}"
 
 # ── Bootstrap task ────────────────────────────────────────────────────────────
 # Orchestrates post-bootstrap steps via depends. Each sub-task is also runnable
-# independently (e.g. 'mise run bootstrap:gui' to reinstall GUI casks alone).
+# independently (e.g. 'mise run bootstrap:atuin-hooks').
 # sync-completions is NOT called here — the existing postinstall hook already
 # runs it automatically when 'mise bootstrap' installs tools.
 [tasks.bootstrap]

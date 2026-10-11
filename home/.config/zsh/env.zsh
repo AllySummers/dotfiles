@@ -41,7 +41,6 @@ if [[ -d "$homebrew_prefix" ]]; then
   export HOMEBREW_OPT="${HOMEBREW_OPT:-$HOMEBREW_PREFIX/opt}"
   export HOMEBREW_LIB="${HOMEBREW_LIB:-$HOMEBREW_PREFIX/lib}"
   export HOMEBREW_BUNDLE_DUMP_DESCRIBE="${HOMEBREW_BUNDLE_DUMP_DESCRIBE:-true}"
-  export HOMEBREW_BUNDLE_FILE_GLOBAL="${HOMEBREW_BUNDLE_FILE_GLOBAL:-$HOME/.Brewfile}"
   export TERMINFO="$HOMEBREW_OPT/ncurses/share/terminfo:/Applications/kitty.app/Contents/Resources/terminfo"
 fi
 

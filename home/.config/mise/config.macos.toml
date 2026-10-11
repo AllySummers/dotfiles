@@ -1,25 +1,16 @@
-# Loaded by mise on macOS only (requires auto_env = true in config.toml).
-# Merges with config.toml — brew/brew-cask packages are additive.
+# Loaded by mise on macOS only (requires auto_env = true in ~/.miserc.toml).
 # ── Bootstrap: macOS packages ─────────────────────────────────────────────────
-# Moved to ~/.Brewfile — mise's brew-cask: backend counts .metadata as a version
-# directory, causing spurious "multiple Caskroom versions found" warnings on every
-# `mise install`. Managing via brew bundle avoids this until the bug is fixed.
-# To re-enable, uncomment below and remove the entries from ~/.Brewfile.
+# Standalone CLI tools live in config.toml; native packages and apps live here.
+# Existing Homebrew-installed casks still use Homebrew or their own updater.
 [bootstrap.packages]
-# # Homebrew formulae
+# Homebrew formulae
 # "brew:bash" = "latest"
-# "brew:binutils" = "latest"
-# "brew:calc" = "latest"
 # "brew:coreutils" = "latest"
 # "brew:diffutils" = "latest"
-# "brew:ed" = "latest"
 # "brew:findutils" = "latest"
-# "brew:flex" = "latest"
 # "brew:gawk" = "latest"
-# "brew:glow" = "latest"
 # "brew:gnu-sed" = "latest"
 # "brew:gnu-tar" = "latest"
-# "brew:gnu-which" = "latest"
 # "brew:gnupg" = "latest"
 # "brew:gpatch" = "latest"
 # "brew:grep" = "latest"
@@ -28,13 +19,22 @@
 # "brew:less" = "latest"
 # "brew:make" = "latest"
 # "brew:nano" = "latest"
-# "brew:screen" = "latest"
-# "brew:watch" = "latest"
-# "brew:wdiff" = "latest"
 # "brew:wget" = "latest"
 # "brew:zip" = "latest"
 # "brew:zsh" = "latest"
-# # Casks
+# "brew:git" = "latest"
+# "brew:ffmpeg-full" = "latest"
+# "brew:pkgconf" = "latest"
+
+# # Applications
+# "brew-cask:cursor" = "latest"
+# "brew-cask:cursor-cli" = "latest"
+# "brew-cask:docker-desktop" = "latest"
+# "brew-cask:firefox" = "latest"
+# "brew-cask:git-credential-manager" = "latest"
+# "brew-cask:visual-studio-code" = "latest"
+# "brew-cask:visual-studio-code@insiders" = "latest"
+# "brew-cask:betterdisplay" = "latest"
 # "brew-cask:1password@beta" = "latest"
 # "brew-cask:alt-tab" = "latest"
 # "brew-cask:bettertouchtool" = "latest"
@@ -43,7 +43,8 @@
 # "brew-cask:google-chrome" = "latest"
 # "brew-cask:google-chrome@canary" = "latest"
 # "brew-cask:kitty" = "latest"
-# "brew-cask:lastpass" = "latest"
+# # Not currently installed; enable only if LastPass is needed again.
+# # "brew-cask:lastpass" = "latest"
 # "brew-cask:linearmouse" = "latest"
 # "brew-cask:shottr" = "latest"
 # "brew-cask:spotify" = "latest"
@@ -266,11 +267,3 @@ run = [
 # sudo mdutil -E / > /dev/null
 # sudo chflags nohidden /Volumes
 # """
-
-# ── Bootstrap: macOS GUI casks via Homebrew ───────────────────────────────────
-# Casks with binary/pkg/preflight artifacts that brew-cask: can't handle.
-# Installs Homebrew first if not already present.
-
-# [tasks."bootstrap:gui"]
-# description = "Install GUI casks via Homebrew"
-# run = "HOMEBREW_BUNDLE_NO_LOCK=1 brew bundle --global --no-upgrade"

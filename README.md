@@ -45,7 +45,7 @@ DOTFILES_SOURCE   If set to an existing directory, links it as the dotfiles
 3. **`[bootstrap.macos.defaults]`** — writes macOS system preferences
 4. **`[bootstrap.user]`** — sets the login shell to zsh
 5. **`mise install [tools]`** — installs all pinned tools from the global config
-6. **`[tasks.bootstrap]`** — installs atuin agent hooks and GUI casks
+6. **`[tasks.bootstrap]`** — installs atuin agent hooks
 
 ## repo layout
 
@@ -54,11 +54,11 @@ home/.zshenv                          -> ~/.zshenv
 home/.zprofile                        -> ~/.zprofile
 home/.zshrc                           -> ~/.zshrc
 home/.gitconfig                       -> ~/.gitconfig
-home/.Brewfile                        -> ~/.Brewfile
 home/.config/zsh/                     -> ~/.config/zsh/  (symlink-each; keeps untracked secrets.zsh / local.zsh)
 home/.config/sheldon/plugins.toml     -> ~/.config/sheldon/plugins.toml
 home/.config/atuin/config.toml        -> ~/.config/atuin/config.toml
 home/.config/mise/config.toml         -> ~/.config/mise/config.toml  (self-managed symlink)
+home/.config/mise/config.macos.toml   -> ~/.config/mise/config.macos.toml
 home/.config/Cursor/User/settings.json.tmpl  (Tera template, rendered per platform — see below)
 ```
 
@@ -71,6 +71,8 @@ The Cursor settings template is rendered to a platform-specific path by mise:
 | Windows  | `~/AppData/Roaming/Cursor/User/settings.json` |
 
 Platform-specific dotfiles entries live in the matching `config.<os>.toml` file alongside the global `config.toml`.
+
+On macOS, formulae and applications are declared under `[bootstrap.packages]` in `config.macos.toml`; there is no Brewfile. Preview changes with `mise bootstrap packages apply --dry-run`, then install missing packages with `mise bootstrap packages apply`. Existing Homebrew-installed casks remain Homebrew-owned, so use Homebrew or the app updater to maintain them.
 
 ## machine-local overrides (not tracked)
 

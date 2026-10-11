@@ -6,12 +6,12 @@
 #    global mise config (and the macOS platform config) so they are readable.
 # 3. Runs 'mise bootstrap --yes' from $HOME, which reads the global config
 #    and handles the rest:
-#      a. [bootstrap.packages]  — brew formulae, app-only casks, apt/pacman/dnf
+#      a. [bootstrap.packages]  — brew formulae and casks, apt/pacman/dnf
 #      b. [dotfiles] apply      — symlinks and Cursor settings template
 #      c. [bootstrap.macos.*]   — macOS defaults
 #      d. [bootstrap.user]      — login shell (chsh)
 #      e. mise install [tools]  — tools from global config
-#      f. [tasks.bootstrap]     — atuin hooks, GUI casks
+#      f. [tasks.bootstrap]     — atuin hooks
 #
 # Usage: ./setup.sh [--repo <url>] [--branch <branch>]
 #
