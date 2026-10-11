@@ -8,6 +8,7 @@ self_update.minimum_release_age = "6h"
 
 [env]
 BLACKSMITH_DISABLE_AUTO_UPDATE = "1"
+ENTIRE_TELEMETRY_OPTOUT = true
 
 [dotfiles]
 "~/.miserc.toml" = { mode = "symlink" }
@@ -52,7 +53,7 @@ node = "24"
 pnpm = "latest"
 deno = "latest"
 # bun = "latest"
-python = "3.14.8"
+python = "3.15.0"
 pipx = "latest"
 # rust = "latest"
 # go = "latest"
@@ -61,14 +62,14 @@ pipx = "latest"
 delta = "latest"
 ripgrep = "latest"
 bat = "latest"
-fzf = "0.74.4"
+fzf = "0.74.5"
 hk = "latest"
 fd = "latest"
 aube = "latest"
 jq = "latest"
 yq = "latest"
 fx = "latest"
-ast-grep = "0.45.3"
+ast-grep = "0.50.0"
 hyperfine = "latest"
 killport = "2.0.2"
 watchexec = "latest"
@@ -77,9 +78,7 @@ watchexec = "latest"
 gh = "latest"
 "github:microsoft/apm" = "latest"
 pitchfork = "latest"
-# "npm:typescript" = "6.0.3"
-# "npm:tsx" = "4.22.4"
-"npm:@withgraphite/graphite-cli" = "latest"
+graphite = "latest"
 jd = "latest"
 codex = "latest"
 "github:KarnerTh/mermerd" = "latest"
@@ -88,16 +87,22 @@ lazygit = "latest"
 "github:git-town/git-town" = "latest"
 tombi = "latest"
 1password = "latest"
+entire = "0.11.5-nightly.202610061045.30277e885"
 
+[tools."pipx:git+https://github.com/openai/privacy-filter.git"]
+version = "latest"
+uvx_args = "--python 3.14"
 
 [tools."http:blacksmith"]
-version = "0.4.46"
+version = "0.4.70"
 url = 'https://clireleases.blacksmith.sh/cli/v{{ version }}/{{ os(macos="darwin") }}/{{ arch(x64="amd64") }}/blacksmith'
 checksum_url = 'https://clireleases.blacksmith.sh/cli/v{{ version }}/{{ os(macos="darwin") }}/{{ arch(x64="amd64") }}/blacksmith.sha256'
 checksum_expr = '"sha256:" + split(trim(body), " ")[0]'
+version_list_url = "https://clireleases.blacksmith.sh/cli/version.json"
+version_json_path = ".version"
 
 [tools.qsv]
-version = "23.0.1"
+version = "24.0.0"
 lazy = true
 
 [shell_alias]
