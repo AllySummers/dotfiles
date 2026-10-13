@@ -49,6 +49,10 @@
 # "brew-cask:shottr" = "latest"
 # "brew-cask:spotify" = "latest"
 
+[bootstrap.macos.login_items]
+exclusive = true
+apps = ["/Applications/BetterDisplay.app", "/Applications/BetterTouchTool.app", "/Applications/LinearMouse.app", "/Applications/Shottr.app"]
+
 # ── Bootstrap: macOS defaults ─────────────────────────────────────────────────
 # Check drift with: mise bootstrap macos-defaults status
 
