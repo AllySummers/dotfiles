@@ -46,6 +46,10 @@ variants = [
   { os = "windows", target = "~/AppData/Roaming/Cursor/User/settings.json" },
 ]
 
+[tool_alias]
+# hyperfine in vfox or whatever is broken with 2.0 for now?
+hyperfine.backend = 'github:sharkdp/hyperfine'
+
 [tools]
 # shell / dotfiles
 atuin = "latest"
