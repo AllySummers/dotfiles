@@ -13,7 +13,10 @@ minimum_release_age_excludes = [
   "deno",
   "gh",
 ]
-self_update.minimum_release_age = "6h"
+
+[settings.self_update]
+minimum_release_age = "6h"
+auto = true
 
 [env]
 BLACKSMITH_DISABLE_AUTO_UPDATE = "1"
@@ -60,7 +63,7 @@ usage = "latest"
 
 # languages & runtimes
 node = "24"
-"aqua:npm/cli" = "12.2.0"
+"aqua:npm/cli" = "12.2.1"
 pnpm = "latest"
 deno = "latest"
 # bun = "latest"
@@ -80,7 +83,7 @@ aube = "latest"
 jq = "latest"
 yq = "latest"
 fx = "latest"
-ast-grep = "0.50.0"
+ast-grep = "0.51.0"
 hyperfine = "latest"
 killport = "2.0.2"
 watchexec = "latest"
@@ -105,11 +108,11 @@ entire = "0.11.5"
 qsv = "25.0.0"
 
 [tools."pipx:git+https://github.com/openai/privacy-filter.git"]
-version = "latest"
-uvx_args = "--python 3.14"
+version = "f7f00ca7fb869683eb732c010299d901457f19c3"
+python = "3.14"
 
 [tools."http:blacksmith"]
-version = "0.4.71"
+version = "0.5.0"
 url = 'https://clireleases.blacksmith.sh/cli/v{{ version }}/{{ os(macos="darwin") }}/{{ arch(x64="amd64") }}/blacksmith'
 checksum_url = 'https://clireleases.blacksmith.sh/cli/v{{ version }}/{{ os(macos="darwin") }}/{{ arch(x64="amd64") }}/blacksmith.sha256'
 checksum_expr = '"sha256:" + split(trim(body), " ")[0]'
@@ -119,27 +122,6 @@ version_json_path = ".version"
 [shell_alias]
 mi = "mise install "
 gtt = "git-town "
-
-# ── Bootstrap: system packages (Linux) ───────────────────────────────────────
-# brew/brew-cask packages live in config.macos.toml (loaded on macOS only).
-[bootstrap.packages]
-"apt:git" = "latest"
-"apt:curl" = "latest"
-"apt:zsh" = "latest"
-"apt:build-essential" = "latest"
-"apt:ca-certificates" = "latest"
-"pacman:git" = "latest"
-"pacman:curl" = "latest"
-"pacman:zsh" = "latest"
-# "pacman:git-town" = "latest"
-"pacman:base-devel" = "latest"
-"pacman:ca-certificates" = "latest"
-"dnf:git" = "latest"
-"dnf:curl" = "latest"
-"dnf:zsh" = "latest"
-"dnf:make" = "latest"
-"dnf:gcc" = "latest"
-"dnf:ca-certificates" = "latest"
 
 # ── Bootstrap: user ───────────────────────────────────────────────────────────
 [bootstrap.user]

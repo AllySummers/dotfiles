@@ -1,0 +1,20 @@
+# ── Bootstrap: system packages (Linux) ───────────────────────────────────────
+# brew/brew-cask packages live in config.macos.toml (loaded on macOS only).
+[bootstrap.packages]
+"apt:git" = "latest"
+"apt:curl" = "latest"
+"apt:zsh" = "latest"
+"apt:build-essential" = "latest"
+"apt:ca-certificates" = "latest"
+"pacman:git" = "latest"
+"pacman:curl" = "latest"
+"pacman:zsh" = "latest"
+# "pacman:git-town" = "latest"
+"pacman:base-devel" = "latest"
+"pacman:ca-certificates" = "latest"
+"dnf:git" = "latest"
+"dnf:curl" = "latest"
+"dnf:zsh" = "latest"
+"dnf:make" = "latest"
+"dnf:gcc" = "latest"
+"dnf:ca-certificates" = "latest"
