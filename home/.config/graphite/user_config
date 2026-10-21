@@ -1,0 +1,11 @@
+{
+  "branchPrefix": "allys/",
+  "branchDate": false,
+  "skipApplyingPrefixToNonGeneratedBranchNames": true,
+  "allowSlashesInGeneratedBranchNames": true,
+  "allowUpperCaseInGeneratedBranchNames": false,
+  "pager": "bat -p",
+  "updateAutomatically": false,
+  "deleteMergedOrClosedBranchesInSync": false,
+  "promptForUpdates": false
+}

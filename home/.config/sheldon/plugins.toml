@@ -3,6 +3,23 @@ shell = "zsh"
 [templates]
 defer = "{{ hooks?.pre | nl }}{% for file in files %}zsh-defer source \"{{ file }}\"\n{% endfor %}{{ hooks?.post | nl }}"
 
+# Rebuild the selected symlinks only when the allowlist changes.
+completion-links = '''
+() {
+  local dir="$ZSH_CACHE_DIR/sheldon/{{ name }}" file
+  local selection="${(F)@}"
+  if [[ ! -r "$dir/.selection" || "$(<"$dir/.selection")" != "$selection" ]]; then
+    mkdir -p -- "$dir" || return
+    rm -f -- "$dir"/*(N@) "$ZSH_COMPDUMP_FILE"{,.zwc} || return
+    for file in "$@"; do
+      ln -sf -- "$file" "$dir/" || return
+    done
+    print -r -- "$selection" > "$dir/.selection" || return
+  fi
+  fpath+=("$dir")
+} {% for file in files %}"{{ file }}" {% endfor %}
+'''
+
 [plugins]
 
 [plugins.oh-my-zsh-lib]
@@ -56,10 +73,6 @@ dir = "plugins/extract"
 github = "ohmyzsh/ohmyzsh"
 dir = "plugins/git"
 
-[plugins.omz-github]
-github = "ohmyzsh/ohmyzsh"
-dir = "plugins/github"
-
 [plugins.omz-gitignore]
 github = "ohmyzsh/ohmyzsh"
 dir = "plugins/gitignore"
@@ -92,8 +105,15 @@ apply = ["defer"]
 github = "vasyharan/zsh-brew-services"
 profiles = ["macos", "macos-docker"]
 
-[plugins.zsh-completions]
-github = "clarketm/zsh-completions"
+# Uncomment this block and list at least one completion to enable it.
+# Sheldon rejects an empty `use` list for Git plugins.
+# [plugins.zsh-completions]
+# github = "clarketm/zsh-completions"
+# use = [
+#   "src/_direnv",
+#   "src/_httpie",
+# ]
+# apply = ["completion-links"]
 
 [plugins.mac-zsh-completions]
 github = "scriptingosx/mac-zsh-completions"

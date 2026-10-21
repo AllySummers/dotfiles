@@ -1,0 +1,27 @@
+model = "gpt-6.1-sol"
+model_reasoning_effort = "high"
+personality = "pragmatic"
+sandbox_mode = "read-only"
+service_tier = "priority"
+web_search = "live"
+
+[desktop]
+conversationDetailMode = "STEPS_COMMANDS"
+default-service-tier = "fast"
+dock-icon-preference = "app-default"
+enabled-reasoning-efforts = ["low", "medium", "high", "xhigh", "ultra", "max"]
+followUpQueueMode = "queue"
+git-pull-request-merge-method = "squash"
+open-link-in-target-preference = "external-browser"
+avatar-overlay-pet-visible = false
+
+[desktop.open-in-target-preferences]
+global = "cursor"
+
+[features]
+js_repl = true
+memories = true
+
+[memories]
+generate_memories = true
+use_memories = true

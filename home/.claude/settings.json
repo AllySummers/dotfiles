@@ -1,0 +1,6 @@
+{
+  "effortLevel": "medium",
+  "theme": "dark",
+  "switchModelsOnFlag": true,
+  "model": "sonnet"
+}

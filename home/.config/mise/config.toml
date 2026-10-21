@@ -39,6 +39,22 @@ ENTIRE_TELEMETRY_OPTOUT = true
 "~/.cursor/hooks.json" = { mode = "symlink" }
 "~/.cursor/hooks" = { mode = "symlink-each", manifest = "git" }
 
+# Partial edits: mise only owns the keys in each file below; apps keep the rest.
+# With no `source`, a merge entry reads the target's path under dotfiles.root.
+# Graphite's ~/.config/graphite/user_config has no .json extension, and `merge`
+# infers the format from the target's extension, so it can't be merged yet. Enable once
+# supported (the file excludes authToken/gtiConfigs):
+# "~/.config/graphite/user_config/shared" = { merge = true }
+"~/.config/gh/config.yml/shared" = { merge = true }
+"~/.codex/config.toml/shared" = { merge = true }
+"~/.claude/settings.json/shared" = { merge = true }
+
+# Whole files (symlinked from ~/.dotfiles/home).
+"~/.config/kitty/kitty.conf" = { mode = "symlink" }
+"~/.config/kitty/kitty.app.icns" = { mode = "symlink" }
+"~/.config/linearmouse/linearmouse.json" = { mode = "symlink" }
+"~/.codex/keybindings.json" = { mode = "symlink" }
+
 # Cursor settings: one template, per-OS destination.
 [dotfiles."cursor-settings"]
 source = "~/.dotfiles/home/.config/Cursor/User/settings.json.tmpl"
@@ -106,10 +122,11 @@ tombi = "latest"
 # 1password = "latest"
 entire = "0.11.5"
 qsv = "25.0.0"
+jactionlint = "latest"
 
-[tools."pipx:git+https://github.com/openai/privacy-filter.git"]
-version = "f7f00ca7fb869683eb732c010299d901457f19c3"
-python = "3.14"
+# [tools."pipx:git+https://github.com/openai/privacy-filter.git"]
+# version = "f7f00ca7fb869683eb732c010299d901457f19c3"
+# python = "3.14"
 
 [tools."http:blacksmith"]
 version = "0.5.0"
