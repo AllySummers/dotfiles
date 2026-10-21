@@ -1,0 +1,1 @@
+This directory contains configs that for things that can't be applied automatically.
