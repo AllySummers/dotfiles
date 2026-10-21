@@ -85,7 +85,7 @@ deno = "latest"
 # bun = "latest"
 python = "3.15.0"
 pipx = "latest"
-rust = "latest"
+# rust = "latest"
 go = "latest"
 
 # cli utilities
