@@ -83,7 +83,7 @@ node = "24"
 pnpm = "latest"
 deno = "latest"
 # bun = "latest"
-python = "3.15.0"
+python = "3.15.1"
 pipx = "latest"
 # rust = "latest"
 go = "latest"
@@ -120,8 +120,8 @@ lazygit = "latest"
 "github:git-town/git-town" = "latest"
 tombi = "latest"
 # 1password = "latest"
-entire = "0.11.5"
-qsv = "25.0.0"
+entire = "0.12.1"
+qsv = "26.0.0"
 jactionlint = "latest"
 
 # [tools."pipx:git+https://github.com/openai/privacy-filter.git"]
@@ -129,7 +129,7 @@ jactionlint = "latest"
 # python = "3.14"
 
 [tools."http:blacksmith"]
-version = "0.5.0"
+version = "0.5.3"
 url = 'https://clireleases.blacksmith.sh/cli/v{{ version }}/{{ os(macos="darwin") }}/{{ arch(x64="amd64") }}/blacksmith'
 checksum_url = 'https://clireleases.blacksmith.sh/cli/v{{ version }}/{{ os(macos="darwin") }}/{{ arch(x64="amd64") }}/blacksmith.sha256'
 checksum_expr = '"sha256:" + split(trim(body), " ")[0]'
