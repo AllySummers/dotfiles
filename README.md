@@ -12,6 +12,7 @@ My personal dotfiles, managed with [mise](https://mise.jdx.dev) `[dotfiles]`.
 - **atuin** — shell history
 - **git** — base gitconfig with machine-local overrides via include
 - **Cursor** — editor settings (Tera template, rendered per platform)
+- **APM** — shared AI agent configuration (set up manually with `mise run apm:setup`)
 
 ## quick start
 

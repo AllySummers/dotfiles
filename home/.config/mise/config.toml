@@ -34,6 +34,8 @@ ENTIRE_TELEMETRY_OPTOUT = true
 "~/.config/atuin/config.toml" = { mode = "symlink" }
 "~/.config/mise/config.toml" = { mode = "symlink" }
 "~/.config/mise/config.macos.toml" = { mode = "symlink" }
+# Copy APM sources as regular files while preserving its generated state.
+"~/.apm" = { mode = "copy" }
 # Only these two files are managed here -- ~/.cursor/ holds a lot of Cursor's
 # own app state, so it's deliberately not symlinked as a whole directory.
 "~/.cursor/hooks.json" = { mode = "symlink" }
@@ -215,6 +217,19 @@ depends = ["bootstrap:*"]
 [tasks."bootstrap:atuin-hooks"]
 description = "Install atuin agent hooks (claude-code, codex, pi)"
 run = ["atuin hook install claude-code", "atuin hook install codex", "atuin hook install pi"]
+
+[tasks."apm:setup"]
+description = "Copy APM config and install and compile global agent instructions"
+usage = '''
+flag "-f --force" help="Force APM install and replace Copilot and Codex global AGENTS.md files"
+'''
+run = [
+  'mise dotfiles apply "{{ env.HOME }}/.apm"',
+  "apm install --global{% if usage.force %} --force{% endif %}",
+  # they don't support instructions files so they just get deleted i guess
+  '{% if usage.force %}rm -fv "{{ env.HOME }}/.copilot/AGENTS.md" "{{ env.HOME }}/.codex/AGENTS.md"{% endif %}',
+  "apm compile --global",
+]
 
 [tasks."git:remotes"]
 description = "Convert GitHub remotes to SSH or HTTPS"

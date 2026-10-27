@@ -1,0 +1,12 @@
+name: ally-global
+version: 1.0.0
+
+targets:
+  - cursor
+  - copilot
+  - codex
+  - claude
+
+dependencies:
+  apm:
+    - path: ~/.apm/instructions/ai-disclosure.instructions.md
