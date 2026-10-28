@@ -130,6 +130,11 @@ jactionlint = "latest"
 # version = "f7f00ca7fb869683eb732c010299d901457f19c3"
 # python = "3.14"
 
+[tools."npm:ctx7"]
+version = "latest"
+lazy = true
+lazy_bins = ["ctx7"]
+
 [tools."http:blacksmith"]
 version = "0.5.3"
 url = 'https://clireleases.blacksmith.sh/cli/v{{ version }}/{{ os(macos="darwin") }}/{{ arch(x64="amd64") }}/blacksmith'
@@ -229,6 +234,19 @@ run = [
   # they don't support instructions files so they just get deleted i guess
   '{% if usage.force %}rm -fv "{{ env.HOME }}/.copilot/AGENTS.md" "{{ env.HOME }}/.codex/AGENTS.md"{% endif %}',
   "apm compile --global",
+]
+
+[tasks."agent:setup"]
+description = "Set up global APM instructions and Context7 MCP for coding agents"
+raw = true
+usage = '''
+flag "-f --force" help="Pass --force to apm:setup"
+'''
+# Run Context7 after APM compile so its rules are added to the generated files.
+# APM's copilot target covers CLI and IDE; Context7 configures them separately.
+run = [
+  "mise run apm:setup{% if usage.force %} --force{% endif %}",
+  "ctx7 setup --claude --cursor --vscode --copilot --codex --mcp --yes",
 ]
 
 [tasks."git:remotes"]

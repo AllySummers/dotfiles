@@ -1,0 +1,4 @@
+interface:
+  display_name: "PR Description"
+  short_description: "Write clear PR titles and focused Overview bullets"
+  default_prompt: "Use $pr-description to draft or update the title and description for this change."

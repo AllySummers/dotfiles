@@ -10,4 +10,5 @@ targets:
 dependencies:
   apm:
     - path: ~/.apm/instructions/ai-disclosure.instructions.md
+    - path: ~/.apm/skills/pr-description
     - github/gh-stack/skills/gh-stack
