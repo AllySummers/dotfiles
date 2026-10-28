@@ -223,7 +223,7 @@ depends = ["bootstrap:*"]
 description = "Install atuin agent hooks (claude-code, codex, pi)"
 run = ["atuin hook install claude-code", "atuin hook install codex", "atuin hook install pi"]
 
-[tasks."apm:setup"]
+[tasks."dotfiles:apm:setup"]
 description = "Copy APM config and install and compile global agent instructions"
 usage = '''
 flag "-f --force" help="Force APM install and replace Copilot and Codex global AGENTS.md files"
@@ -236,16 +236,16 @@ run = [
   "apm compile --global",
 ]
 
-[tasks."agent:setup"]
+[tasks."dotfiles:agent:setup"]
 description = "Set up global APM instructions and Context7 MCP for coding agents"
 raw = true
 usage = '''
-flag "-f --force" help="Pass --force to apm:setup"
+flag "-f --force" help="Pass --force to dotfiles:apm:setup"
 '''
 # Run Context7 after APM compile so its rules are added to the generated files.
 # APM's copilot target covers CLI and IDE; Context7 configures them separately.
 run = [
-  "mise run apm:setup{% if usage.force %} --force{% endif %}",
+  "mise run dotfiles:apm:setup{% if usage.force %} --force{% endif %}",
   "ctx7 setup --claude --cursor --vscode --copilot --codex --mcp --yes",
 ]
 

@@ -12,9 +12,9 @@ My personal dotfiles, managed with [mise](https://mise.jdx.dev) `[dotfiles]`.
 - **atuin** — shell history
 - **git** — base gitconfig with machine-local overrides via include
 - **Cursor** — editor settings (Tera template, rendered per platform)
-- **AI agents** — shared APM instructions and Context7 MCP (set up manually with `mise run agent:setup`; use `mise run apm:setup` for APM only)
+- **AI agents** — shared APM instructions and Context7 MCP (set up manually with `mise run dotfiles:agent:setup`; use `mise run dotfiles:apm:setup` for APM only)
 
-`mise run agent:setup --force` forwards `--force` to APM setup. Context7’s `ctx7` CLI installs on first use through mise; its setup may open a browser for authentication.
+`mise run dotfiles:agent:setup --force` forwards `--force` to APM setup. Context7’s `ctx7` CLI installs on first use through mise; its setup may open a browser for authentication.
 
 ## quick start
 
