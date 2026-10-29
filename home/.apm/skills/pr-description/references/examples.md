@@ -1,6 +1,6 @@
 # Examples
 
-These are fictional examples. Assume the facts were checked against the diff and available evidence. PR numbers and paths are illustrative. Add the required AI-disclosure footer when publishing.
+These are fictional examples. Assume the facts were checked against the diff and available evidence. PR numbers and paths are illustrative. Add the required AI-disclosure footer when publishing. Examples use the default Overview layout; adapt headings and required fields to the repository template.
 
 ## Small fix
 
@@ -180,10 +180,29 @@ Chat handoff: “Replaced the screenshot with a visible TODO for the Feedback ta
 
 Do not add placeholders to sibling PRs that had no screenshots, or invent extra scenarios. If another capture would materially help, suggest it separately. If a retained asset cannot be viewed, keep its existing caption and disclose that limit instead of guessing.
 
+## Reapply a missing repository template
+
+The repository template requires `## Summary` and `## Rollout`. An existing PR has only a paragraph and a screenshot. Keep its useful explanation and screenshot, organize them under the template, and restore Rollout:
+
+```markdown
+## Summary
+
+- Let users export the filtered results as CSV.
+
+## Rollout
+
+TODO: Confirm whether the export flag should be enabled at merge or after deployment.
+```
+
+Keep the existing screenshot alongside the relevant content. Do not add another Overview heading, invent the rollout answer, or remove Rollout merely because it is unfinished. Tell the user that the rollout TODO still needs an answer. Restore required checklist items too, without inventing completed checks.
+
 ## Detail selection
 
 | Draft content | Editorial decision |
 | --- | --- |
+| An existing PR omits the repository template | Reapply its structure and missing required fields, retaining useful content and media. |
+| The template uses Summary instead of Overview | Keep Summary and use concise bullets; do not duplicate the section. |
+| A required template field has no verified answer | Keep it with a visible TODO and list the missing answer in the handoff. |
 | Lint, typecheck, and required tests passed locally and in CI | Remove the routine status report. |
 | A required CI integration run passed | Omit the routine result, including when someone triggered it manually. |
 | Every PR has “not checked in a browser” under Validation | Remove generic boilerplate; retain only a specific, consequential gap supported by evidence. |

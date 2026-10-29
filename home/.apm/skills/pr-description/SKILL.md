@@ -19,6 +19,16 @@ Use available GitHub, Graphite/stack skills such as `gh-stack`, `pr-stack`, or `
 
 Fallback when no skill applies: read `gh pr view <pr> --json baseRefName,headRefOid,title,body` and available stack metadata; if the intended parent is still unclear, ask.
 
+## Follow the repository template
+
+Find and follow the applicable repository PR template when creating or editing a description. Use its headings, order, required fields, checklists, and machine-readable markers. If several templates exist, choose the one for this PR's type; do not silently use an unrelated template.
+
+If an existing PR is missing the template or its required sections, reapply it. Fit the current useful content into the template and restore missing parts instead of replacing the body with a blank skeleton. Preserve attachments, issue links, user edits, and automation-managed blocks without duplicating them.
+
+Fill fields from verified facts and tick checkboxes only when supported. If a required answer is missing, use a visible TODO and list it in the handoff. Remove optional or inapplicable sections only where the template permits. Keep required fields even when this skill would normally omit them; use an honest not-applicable answer when the template requires one.
+
+The template controls structure, not permission to invent evidence or add routine CI reports. Keep required checklist items, but do not repeat CI results in prose or fill a validation section with generic “not tested” caveats.
+
 ## Explain misleading diff sizes
 
 When moves, renames, file splits, or formatting inflate a diff, use the relevant commands in [references/diff-inspection.md](references/diff-inspection.md). Tell the reviewer plainly when existing code accounts for much of the apparent addition/deletion, then name the behavior changes. For a revert, explain what returns and what remains unresolved; verify any claim of an exact restoration. Check the code before claiming behavior is unchanged; do not tell reviewers to ignore moved code wholesale.
@@ -27,19 +37,19 @@ When moves, renames, file splits, or formatting inflate a diff, use the relevant
 
 Name the affected behavior with a short active phrase: `Keep clause suggestions before the first heading`. Follow required repository prefixes and ticket conventions. Avoid vague titles such as `Improve handling` or `Address feedback`. For internal work, name the maintainer benefit without inventing a user-facing change.
 
-Every body needs `## Overview` and a flat `-` bullet list. An optional one- or two-sentence introduction can explain the problem before the bullets. Omit it when the bullets already supply the context.
+Use a flat `-` bullet list in the template’s overview or summary section, keeping its heading. When no template specifies that section, use `## Overview`. Do not add a duplicate Overview beside the template’s Summary. An optional one- or two-sentence introduction can explain the problem before the bullets. Omit it when the bullets already supply the context.
 
 Usually two to five short bullets suffice; one is fine for a small fix. Explain the trigger and outcome. Keep permissions, destructive effects, and surprising choices. Omit endpoint paths, helper names, field inventories, cache mechanics, and routine loading states unless their exact form matters to review. Let useful information set the length, not a bullet quota.
 
-Add sections such as `Screenshots`, `Rollout`, or `Performance` only when they make important information easier to find. Keep relevant permission and data boundaries, breaking changes, migrations or backfills, deploy order, feature flags, accepted tradeoffs, and known limitations. Avoid unsupported claims that a change is safe or low risk. State each caveat once, beside its claim.
+Beyond the template’s required sections, add sections such as `Screenshots`, `Rollout`, or `Performance` only when they make important information easier to find. Keep relevant permission and data boundaries, breaking changes, migrations or backfills, deploy order, feature flags, accepted tradeoffs, and known limitations. Avoid unsupported claims that a change is safe or low risk. State each caveat once, beside its claim.
 
 Link documentation when a new or particularly relevant feature, API, or behavior needs explanation. Prefer the specific official section for the version used; a design decision, migration guide, or focused article may explain the choice better. Verify the link and place it beside the relevant point. Explain enough that the PR still makes sense without opening it. Skip generic homepages and a default References section.
 
-Keep useful issue links, attachments, and tool-managed content, including stack blocks. Use issue-closing keywords only when closure is intended. Retain required repository information without copying empty sections or generic checklists. Use equivalent template headings where useful. A generic request for validation does not override the user's instruction to omit routine CI results or make a Validation section necessary.
+Keep useful issue links, attachments, and tool-managed content, including stack blocks. Use issue-closing keywords only when closure is intended.
 
 ## Keep evidence honest
 
-Do not repeat CI-enforced validation, even if it also passed locally. Omit routine lint, format, typecheck, build, test counts, coverage figures, and “checks passed/pending” reports. Do not add a default Testing or Validation section, or run tests just to fill one.
+Do not repeat CI-enforced validation, even if it also passed locally. Omit routine lint, format, typecheck, build, test counts, coverage figures, and “checks passed/pending” reports. Do not add a Testing or Validation section beyond what the template requires, or run tests just to fill one.
 
 Check the CI configuration when needed to tell what it covers. Include additional testing evidence only when it resolves an important uncertainty that required CI does not cover; hosting a run in GitHub Actions is not itself a reason to include it. Describe regression coverage if it explains the change or is itself the purpose of the PR.
 
@@ -103,11 +113,11 @@ Do not use:
 - Wrap-up or closing sentences. Stop after the last useful detail; keep required links and disclosure footers.
 - Filler such as “comprehensive”, “robust”, “seamless”, “leverage”, “significantly”, or “production-ready”.
 
-Remove file tours, function-call narration, development history, rejected experiments, and repeated explanations. Cut pasted code and diagrams when a short explanation is clearer. Omit “N/A” sections and lists of unchanged behavior unless they prevent a likely misunderstanding. Keep precise terms and real uncertainty.
+Remove file tours, function-call narration, development history, rejected experiments, and repeated explanations. Cut pasted code and diagrams when a short explanation is clearer. Outside required template fields, omit “N/A” sections and lists of unchanged behavior unless they prevent a likely misunderstanding. Keep precise terms and real uncertainty.
 
 Do not hard-wrap PR prose: GitHub renders single line breaks. Keep each paragraph and bullet on one source line; retain deliberate Markdown breaks and code formatting. Wrap `@names` in backticks unless intentionally pinging someone.
 
-Read the finished draft against the diff and checked sources. For each sentence, ask what it helps the reviewer understand or decide. Cut mechanism before cutting a consequential condition. Correct unsupported claims; do not turn possible bugs into settled design decisions.
+Read the finished draft against the repository template, diff, and checked sources. Restore any missing required template sections before saving. For each sentence, ask what it helps the reviewer understand or decide. Cut mechanism before cutting a consequential condition. Correct unsupported claims; do not turn possible bugs into settled design decisions.
 
 ## Hand it back
 
