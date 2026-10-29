@@ -46,7 +46,7 @@ ENTIRE_TELEMETRY_OPTOUT = true
 # Graphite's ~/.config/graphite/user_config has no .json extension, and `merge`
 # infers the format from the target's extension, so it can't be merged yet. Enable once
 # supported (the file excludes authToken/gtiConfigs):
-# "~/.config/graphite/user_config/shared" = { merge = true }
+"~/.config/graphite/user_config/shared" = { merge = true, format = "json" }
 "~/.config/gh/config.yml/shared" = { merge = true }
 "~/.codex/config.toml/shared" = { merge = true }
 "~/.claude/settings.json/shared" = { merge = true }
