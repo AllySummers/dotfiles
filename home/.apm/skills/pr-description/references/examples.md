@@ -132,18 +132,18 @@ A generic library homepage adds little. A migration guide explaining a changed e
 
 ## Replace mechanism with review decisions
 
-For a task-assignment UI, the endpoint URL and cache helper names usually add little. The conditions and destructive effects matter.
+For an incident-reassignment UI, the endpoint URL and cache helper names usually add little. The conditions and destructive effects matter.
 
-Title: `Assign a super verifier from the document Tasks page`
+Title: `Reassign an incident from the incident page`
 
 ```markdown
 ## Overview
 
-- Let users with assignment permission choose an eligible super verifier once the document is verified and has a verifier assigned.
-- Assigning someone replaces the open super verification task.
+- Let incident commanders hand an acknowledged incident to anyone on the current on-call rotation.
+- Reassigning cancels the pending escalation to the next responder.
 ```
 
-No automatic Validation section follows. “I did not open a browser” alone does not justify one. If the ticket forbids replacing an open task, flag that mismatch to the user rather than describing it as an accepted choice.
+No automatic Validation section follows. “I did not open a browser” alone does not justify one. If the ticket forbids cancelling a pending escalation, flag that mismatch to the user rather than describing it as an accepted choice.
 
 ## A specific validation gap
 
