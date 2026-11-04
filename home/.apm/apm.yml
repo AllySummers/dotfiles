@@ -11,4 +11,7 @@ dependencies:
   apm:
     - path: ~/.apm/instructions/ai-disclosure.instructions.md
     - path: ~/.apm/skills/pr-description
+    - path: ~/.apm/prompts/fix-pr-comments.prompt.md
+    - path: ~/.apm/prompts/respond-to-pr-comments.prompt.md
+    - path: ~/.apm/prompts/write-better-comments.prompt.md
     - github/gh-stack/skills/gh-stack
