@@ -43,3 +43,5 @@
 # ~/.gitconfig.local on each machine; included last so it overrides.
 [include]
 	path = ~/.gitconfig.local
+[alias]
+	co = checkout
