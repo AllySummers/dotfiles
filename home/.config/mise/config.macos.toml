@@ -49,14 +49,14 @@
 # "brew-cask:shottr" = "latest"
 # "brew-cask:spotify" = "latest"
 
-[bootstrap.macos.login_items]
+[bootstrap.settings.macos.login_items]
 exclusive = true
 apps = ["/Applications/BetterDisplay.app", "/Applications/BetterTouchTool.app", "/Applications/LinearMouse.app", "/Applications/Shottr.app"]
 
 # ── Bootstrap: macOS defaults ─────────────────────────────────────────────────
 # Check drift with: mise bootstrap macos-defaults status
 
-[bootstrap.macos.defaults.NSGlobalDomain]
+[bootstrap.settings.macos.defaults.NSGlobalDomain]
 # Save / print panels
 NSNavPanelExpandedStateForSaveMode = true
 NSNavPanelExpandedStateForSaveMode2 = true
@@ -103,7 +103,7 @@ AppleFontSmoothing = 1
 # Trackpad force click (global pref)
 "com.apple.trackpad.forceClick" = false
 
-[bootstrap.macos.defaults."com.apple.dock"]
+[bootstrap.settings.macos.defaults."com.apple.dock"]
 autohide = false
 tilesize = 36.0
 show-recents = false
@@ -114,7 +114,7 @@ enterMissionControlByTopWindowDrag = false
 wvous-br-corner = 14
 wvous-br-modifier = 0
 
-[bootstrap.macos.defaults."com.apple.finder"]
+[bootstrap.settings.macos.defaults."com.apple.finder"]
 QuitMenuItem = true
 ShowPathbar = true
 ShowStatusBar = true
@@ -130,81 +130,81 @@ FXPreferredViewStyle = "Nlsv"
 WarnOnEmptyTrash = false
 OpenWindowForNewRemovableDisk = true
 
-[bootstrap.macos.defaults."com.apple.screencapture"]
+[bootstrap.settings.macos.defaults."com.apple.screencapture"]
 type = "png"
 location = "~/Pictures/macos screenshots"  # ~ not expanded by mise; status shows false "differs" but apply is correct
 target = "file"
 disable-shadow = true
 
-[bootstrap.macos.defaults."com.apple.screensaver"]
+[bootstrap.settings.macos.defaults."com.apple.screensaver"]
 askForPassword = 1
 askForPasswordDelay = 0
 
-[bootstrap.macos.defaults."com.apple.print.PrintingPrefs"]
+[bootstrap.settings.macos.defaults."com.apple.print.PrintingPrefs"]
 "Quit When Finished" = true
 
-[bootstrap.macos.defaults."com.apple.LaunchServices"]
+[bootstrap.settings.macos.defaults."com.apple.LaunchServices"]
 LSQuarantine = false
 
-[bootstrap.macos.defaults."com.apple.systempreferences"]
+[bootstrap.settings.macos.defaults."com.apple.systempreferences"]
 NSQuitAlwaysKeepsWindows = false
 
-[bootstrap.macos.defaults."com.apple.helpviewer"]
+[bootstrap.settings.macos.defaults."com.apple.helpviewer"]
 DevMode = true
 
-[bootstrap.macos.defaults."com.apple.SoftwareUpdate"]
+[bootstrap.settings.macos.defaults."com.apple.SoftwareUpdate"]
 AutomaticCheckEnabled = true
 ScheduleFrequency = 1
 AutomaticDownload = 1
 CriticalUpdateInstall = 1
 ConfigDataInstall = 1
 
-[bootstrap.macos.defaults."com.apple.commerce"]
+[bootstrap.settings.macos.defaults."com.apple.commerce"]
 AutoUpdate = true
 AutoUpdateRestartRequired = false
 
-[bootstrap.macos.defaults."com.apple.appstore"]
+[bootstrap.settings.macos.defaults."com.apple.appstore"]
 WebKitDeveloperExtras = true
 ShowDebugMenu = true
 
-[bootstrap.macos.defaults."com.apple.BluetoothAudioAgent"]
+[bootstrap.settings.macos.defaults."com.apple.BluetoothAudioAgent"]
 "Apple Bitpool Min (editable)" = 40
 
-[bootstrap.macos.defaults."com.apple.NetworkBrowser"]
+[bootstrap.settings.macos.defaults."com.apple.NetworkBrowser"]
 BrowseAllInterfaces = true
 
-[bootstrap.macos.defaults."com.apple.desktopservices"]
+[bootstrap.settings.macos.defaults."com.apple.desktopservices"]
 DSDontWriteNetworkStores = true
 DSDontWriteUSBStores = true
 
-[bootstrap.macos.defaults."com.apple.frameworks.diskimages"]
+[bootstrap.settings.macos.defaults."com.apple.frameworks.diskimages"]
 skip-verify = true
 skip-verify-locked = true
 skip-verify-remote = true
 auto-open-ro-root = true
 auto-open-rw-root = true
 
-[bootstrap.macos.defaults."com.apple.Safari"]
+[bootstrap.settings.macos.defaults."com.apple.Safari"]
 IncludeDevelopMenu = true
 WebKitDeveloperExtrasEnabledPreferenceKey = true
 "WebKitPreferences.developerExtrasEnabled" = true
 AutoOpenSafeDownloads = false
 
-[bootstrap.macos.defaults."com.apple.terminal"]
+[bootstrap.settings.macos.defaults."com.apple.terminal"]
 SecureKeyboardEntry = true
 ShowLineMarks = 0
 
-[bootstrap.macos.defaults."com.apple.TimeMachine"]
+[bootstrap.settings.macos.defaults."com.apple.TimeMachine"]
 DoNotOfferNewDisksForBackup = true
 
-[bootstrap.macos.defaults."com.apple.ActivityMonitor"]
+[bootstrap.settings.macos.defaults."com.apple.ActivityMonitor"]
 OpenMainWindow = true
 IconType = 5
 ShowCategory = 100
 SortColumn = "CPUUsage"
 SortDirection = 0
 
-[bootstrap.macos.defaults."com.apple.AppleMultitouchTrackpad"]
+[bootstrap.settings.macos.defaults."com.apple.AppleMultitouchTrackpad"]
 Clicking = true
 ForceSuppressed = true
 ActuateDetents = 0
@@ -212,27 +212,27 @@ TrackpadPinch = 0
 TrackpadRotate = 0
 TrackpadTwoFingerDoubleTapGesture = 0
 
-[bootstrap.macos.defaults."com.apple.driver.AppleBluetoothMultitouch.trackpad"]
+[bootstrap.settings.macos.defaults."com.apple.driver.AppleBluetoothMultitouch.trackpad"]
 Clicking = true
 TrackpadPinch = 0
 TrackpadRotate = 0
 TrackpadTwoFingerDoubleTapGesture = 0
 
-[bootstrap.macos.defaults."com.apple.WindowManager"]
+[bootstrap.settings.macos.defaults."com.apple.WindowManager"]
 EnableStandardClickToShowDesktop = false
 StandardHideWidgets = 1
 EnableTiledWindowMargins = false
 
-[bootstrap.macos.defaults."com.apple.spaces"]
+[bootstrap.settings.macos.defaults."com.apple.spaces"]
 spans-displays = true
 
 # Arrays aren't in the schema for the `defaults` table, so use defaults_entries
-[[bootstrap.macos.defaults_entries]]
+[[bootstrap.settings.macos.defaults_entries]]
 domain = "NSGlobalDomain"
 key = "AppleLanguages"
 value = ["en-US", "en-AU"]
 
-[[bootstrap.macos.defaults_entries]]
+[[bootstrap.settings.macos.defaults_entries]]
 domain = "com.apple.ImageCapture"
 key = "disableHotPlug"
 host = "current"

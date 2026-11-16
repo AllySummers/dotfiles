@@ -45,7 +45,7 @@ DOTFILES_SOURCE   If set to an existing directory, links it as the dotfiles
 
 1. **`[bootstrap.packages]`** — installs apt/pacman/dnf packages (Linux) or brew formulae and casks (macOS)
 2. **`[dotfiles]` apply** — creates symlinks and renders the Cursor settings template
-3. **`[bootstrap.macos.defaults]`** — writes macOS system preferences
+3. **`[bootstrap.settings.macos.defaults]`** — writes macOS system preferences
 4. **`[bootstrap.user]`** — sets the login shell to zsh
 5. **`mise install [tools]`** — installs all pinned tools from the global config
 6. **`[tasks.bootstrap]`** — installs atuin agent hooks
