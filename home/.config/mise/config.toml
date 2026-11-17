@@ -55,7 +55,7 @@ ENTIRE_TELEMETRY_OPTOUT = true
 
 # Whole files (symlinked from ~/.dotfiles/home).
 "~/.config/kitty/kitty.conf" = { mode = "symlink" }
-"~/.config/kitty/kitty.app.icns" = { mode = "symlink" }
+"~/.config/kitty/kitty.app.icns" = { source = "~/.dotfiles/assets/kitty-icon/neue_outrun.icns", mode = "symlink" }
 "~/.config/linearmouse/linearmouse.json" = { mode = "symlink" }
 "~/.codex/keybindings.json" = { mode = "symlink" }
 
@@ -203,15 +203,16 @@ gh stack init --base "$trunk" "${bottom_to_top[@]}"
 '''
 
 # ── Bootstrap task ────────────────────────────────────────────────────────────
-# Orchestrates post-bootstrap steps via depends. Each sub-task is also runnable
+# Orchestrates post-bootstrap steps tagged bootstrap. Each sub-task is also runnable
 # independently (e.g. 'mise run bootstrap:atuin-hooks').
 # sync-completions is NOT called here — the existing postinstall hook already
 # runs it automatically when 'mise bootstrap' installs tools.
 [tasks.bootstrap]
 description = "Post-bootstrap machine setup"
-depends = ["bootstrap:*"]
+depends = [{ tag = "bootstrap" }]
 
 [tasks."bootstrap:atuin-hooks"]
+tags = ["bootstrap"]
 description = "Install atuin agent hooks (claude-code, codex, pi)"
 run = ["atuin hook install claude-code", "atuin hook install codex", "atuin hook install pi"]
 

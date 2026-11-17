@@ -1,4 +1,8 @@
 # Loaded by mise on macOS only (requires auto_env = true in ~/.miserc.toml).
+[tools]
+# The upstream-verified CLI falls below npm's download-count threshold.
+"npm:fileicon" = { version = "0.3.5", allow_low_downloads = true }
+
 # ── Bootstrap: macOS packages ─────────────────────────────────────────────────
 # Standalone CLI tools live in config.toml; native packages and apps live here.
 # Existing Homebrew-installed casks still use Homebrew or their own updater.
@@ -245,7 +249,6 @@ run = [
   # "defaults write com.apple.screencapture location -string \"$HOME/Pictures/macos screenshots\"", # set by mise
   "chflags nohidden ~/Library && xattr -d com.apple.FinderInfo ~/Library 2>/dev/null || true",
   "/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -r -domain local -domain system -domain user",
-  "killall Dock",
   "killall Finder",
   "killall SystemUIServer",
 ]
@@ -271,6 +274,51 @@ run = [
 # sudo mdutil -E / > /dev/null
 # sudo chflags nohidden /Volumes
 # """
+
+# Finder custom icons are separate from the apps' bundled resources.
+# Reapply after app updates if the updater removes the custom icon.
+[task_templates.app-icon]
+tags = ["app-icon"]
+run = [{ task = "dotfiles:icon", args = ["{{ vars.app }}", "{{ env.HOME }}/.dotfiles/assets/{{ vars.icon }}"] }]
+
+[tasks."dotfiles:icon"]
+description = "Apply a custom icon to an installed app"
+usage = '''
+arg "<app>" help="Application bundle path"
+arg "<icon>" help="Icon file path"
+'''
+skip_if = "test ! -d {{ usage.app | quote }}"
+run = "fileicon set {{ usage.app | quote }} {{ usage.icon | quote }}"
+
+[tasks."dotfiles:icons:refresh"]
+description = "Clear the current user's Dock icon cache and restart the Dock"
+run = '''
+set -e
+cache_dir="$(getconf DARWIN_USER_CACHE_DIR)"
+rm -f "${cache_dir:?}/com.apple.dock.iconcache"
+killall Dock
+'''
+
+[tasks."dotfiles:icons:vscode"]
+extends = "app-icon"
+description = "Apply the dark VS Code icon"
+vars = { app = "/Applications/Visual Studio Code.app", icon = "vscode-icons/default_dark.icns" }
+
+[tasks."dotfiles:icons:vscode-insiders"]
+extends = "app-icon"
+description = "Apply the dark VS Code Insiders icon"
+vars = { app = "/Applications/Visual Studio Code - Insiders.app", icon = "vscode-icons/default_insider_dark.icns" }
+
+[tasks."dotfiles:icons:kitty"]
+extends = "app-icon"
+description = "Apply Kitty's Outrun (Neue) icon"
+vars = { app = "/Applications/kitty.app", icon = "kitty-icon/neue_outrun.icns" }
+
+[tasks."dotfiles:icons"]
+description = "Apply custom icons to VS Code, Insiders, and Kitty"
+tags = ["bootstrap"]
+depends = [{ tag = "app-icon" }]
+depends_post = [{ task = "dotfiles:icons:refresh" }]
 
 # Editor settings: shared keys plus two editor-specific keys; keep other app settings.
 [dotfiles]

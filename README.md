@@ -48,7 +48,7 @@ DOTFILES_SOURCE   If set to an existing directory, links it as the dotfiles
 3. **`[bootstrap.settings.macos.defaults]`** — writes macOS system preferences
 4. **`[bootstrap.user]`** — sets the login shell to zsh
 5. **`mise install [tools]`** — installs all pinned tools from the global config
-6. **`[tasks.bootstrap]`** — installs atuin agent hooks
+6. **`[tasks.bootstrap]`** — installs atuin agent hooks and applies custom app icons on macOS
 
 ## repo layout
 
@@ -85,6 +85,35 @@ Preview or apply only the editor settings on macOS:
 mise dotfiles diff "$HOME/Library/Application Support/"{Cursor,Code,"Code - Insiders"}/User/settings.json
 mise dotfiles apply "$HOME/Library/Application Support/"{Cursor,Code,"Code - Insiders"}/User/settings.json
 ```
+
+On macOS, bootstrap applies custom icons to apps in `/Applications`:
+
+- [VS Code and Insiders](assets/vscode-icons/README.md): dark blue and green icons
+  from [dhanishgajjar/vscode-icons](https://github.com/dhanishgajjar/vscode-icons).
+- [Kitty](assets/kitty-icon/README.md): Outrun (Neue) from
+  [k0nserv/kitty-icon](https://github.com/k0nserv/kitty-icon).
+
+The app tasks share a mise task template, use task-local vars, and skip missing
+apps. The aggregate task selects them by the `app-icon` tag. `fileicon` is a
+macOS-only mise tool, installed through its npm backend. Its verified upstream
+package has a scoped allowance for mise's low-download check.
+
+```sh
+mise run dotfiles:icons        # apply all three, or reapply after an app update
+mise run dotfiles:icons:kitty  # apply only Kitty
+```
+
+Individual VS Code tasks are `dotfiles:icons:vscode` and
+`dotfiles:icons:vscode-insiders`.
+
+Git stores the source `.icns` assets; the tasks apply macOS custom-icon metadata.
+An app update may remove that metadata. After `dotfiles:icons` finishes,
+`dotfiles:icons:refresh` clears your Dock icon cache and restarts the Dock once.
+Individual app tasks do not refresh the Dock. You can also run the refresh task
+directly. Reopen running apps if their icons remain stale.
+
+The Kitty asset is also linked to `~/.config/kitty/kitty.app.icns` so Kitty can
+apply it at startup.
 
 On macOS, formulae and applications are declared under `[bootstrap.packages]` in `config.macos.toml`; there is no Brewfile. Preview changes with `mise bootstrap packages apply --dry-run`, then install missing packages with `mise bootstrap packages apply`. Existing Homebrew-installed casks remain Homebrew-owned, so use Homebrew or the app updater to maintain them.
 
