@@ -3,11 +3,11 @@
 #
 # 1. Installs git + curl + mise (minimum bootstrap prerequisites).
 # 2. Clones the dotfiles repo to ~/.dotfiles and seeds ~/.miserc.toml plus the
-#    global mise config (and the macOS platform config) so they are readable.
+#    global mise config and matching platform config so they are readable.
 # 3. Runs 'mise bootstrap --yes' from $HOME, which reads the global config
 #    and handles the rest:
 #      a. [bootstrap.packages]         — brew formulae and casks, apt/pacman/dnf
-#      b. [dotfiles] apply             — symlinks and Cursor settings template
+#      b. [dotfiles] apply             — symlinks and editor settings merges
 #      c. [bootstrap.settings.macos.*] — macOS defaults
 #      d. [bootstrap.user]             — login shell (chsh)
 #      e. mise install [tools]         — tools from global config
@@ -152,6 +152,8 @@ apply_dotfiles() {
   seed_file "$DOTFILES_DIR/home/.config/mise/config.toml" "$HOME/.config/mise/config.toml"
   if [ "$PLATFORM" = "macos" ]; then
     seed_file "$DOTFILES_DIR/home/.config/mise/config.macos.toml" "$HOME/.config/mise/config.macos.toml"
+  else
+    seed_file "$DOTFILES_DIR/home/.config/mise/config.linux.toml" "$HOME/.config/mise/config.linux.toml"
   fi
   ok "Dotfiles seeded"
 }

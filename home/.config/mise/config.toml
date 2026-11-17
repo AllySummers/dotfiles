@@ -34,6 +34,8 @@ ENTIRE_TELEMETRY_OPTOUT = true
 "~/.config/atuin/config.toml" = { mode = "symlink" }
 "~/.config/mise/config.toml" = { mode = "symlink" }
 "~/.config/mise/config.macos.toml" = { mode = "symlink" }
+"~/.config/mise/config.linux.toml" = { mode = "symlink" }
+"~/.config/mise/config.windows.toml" = { mode = "symlink" }
 # Copy APM sources as regular files while preserving its generated state.
 "~/.apm" = { mode = "copy" }
 # Only these two files are managed here -- ~/.cursor/ holds a lot of Cursor's
@@ -56,16 +58,6 @@ ENTIRE_TELEMETRY_OPTOUT = true
 "~/.config/kitty/kitty.app.icns" = { mode = "symlink" }
 "~/.config/linearmouse/linearmouse.json" = { mode = "symlink" }
 "~/.codex/keybindings.json" = { mode = "symlink" }
-
-# Cursor settings: one template, per-OS destination.
-[dotfiles."cursor-settings"]
-source = "~/.dotfiles/home/.config/Cursor/User/settings.json.tmpl"
-mode = "template"
-variants = [
-  { os = "macos", target = "~/Library/Application Support/Cursor/User/settings.json" },
-  { os = "linux", target = "~/.config/Cursor/User/settings.json" },
-  { os = "windows", target = "~/AppData/Roaming/Cursor/User/settings.json" },
-]
 
 [tool_alias]
 # hyperfine in vfox or whatever is broken with 2.0 for now?

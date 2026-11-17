@@ -18,3 +18,12 @@
 "dnf:make" = "latest"
 "dnf:gcc" = "latest"
 "dnf:ca-certificates" = "latest"
+
+# Editor settings: shared keys plus two editor-specific keys; keep other app settings.
+[dotfiles]
+"~/.config/Cursor/User/settings.json/shared" = { source = "~/.dotfiles/templates/editors/settings.jsonc", merge = true, format = "jsonc", template = "tera" }
+"~/.config/Cursor/User/settings.json/editor" = { source = "~/.dotfiles/templates/editors/cursor.json", merge = true, format = "jsonc" }
+"~/.config/Code/User/settings.json/shared" = { source = "~/.dotfiles/templates/editors/settings.jsonc", merge = true, format = "jsonc", template = "tera" }
+"~/.config/Code/User/settings.json/editor" = { source = "~/.dotfiles/templates/editors/vscode.json", merge = true, format = "jsonc" }
+"~/.config/Code - Insiders/User/settings.json/shared" = { source = "~/.dotfiles/templates/editors/settings.jsonc", merge = true, format = "jsonc", template = "tera" }
+"~/.config/Code - Insiders/User/settings.json/editor" = { source = "~/.dotfiles/templates/editors/vscode.json", merge = true, format = "jsonc" }

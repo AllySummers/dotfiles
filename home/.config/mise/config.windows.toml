@@ -1,0 +1,10 @@
+# Loaded by mise on Windows only (requires auto_env = true in ~/.miserc.toml).
+
+# Editor settings: shared keys plus two editor-specific keys; keep other app settings.
+[dotfiles]
+"~/AppData/Roaming/Cursor/User/settings.json/shared" = { source = "~/.dotfiles/templates/editors/settings.jsonc", merge = true, format = "jsonc", template = "tera" }
+"~/AppData/Roaming/Cursor/User/settings.json/editor" = { source = "~/.dotfiles/templates/editors/cursor.json", merge = true, format = "jsonc" }
+"~/AppData/Roaming/Code/User/settings.json/shared" = { source = "~/.dotfiles/templates/editors/settings.jsonc", merge = true, format = "jsonc", template = "tera" }
+"~/AppData/Roaming/Code/User/settings.json/editor" = { source = "~/.dotfiles/templates/editors/vscode.json", merge = true, format = "jsonc" }
+"~/AppData/Roaming/Code - Insiders/User/settings.json/shared" = { source = "~/.dotfiles/templates/editors/settings.jsonc", merge = true, format = "jsonc", template = "tera" }
+"~/AppData/Roaming/Code - Insiders/User/settings.json/editor" = { source = "~/.dotfiles/templates/editors/vscode.json", merge = true, format = "jsonc" }
