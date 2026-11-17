@@ -1,10 +1,11 @@
 ---
+name: write-better-comments
 description: Improve existing code comments within the requested scope without changing code.
 ---
 
 # Write Better Comments
 
-Review the existing comments in `$ARGUMENTS` and improve only the comments. If no scope is supplied, use the currently open or selected files; if that is unclear, ask for a scope before editing.
+Review the existing comments in the files or directories supplied with the request and improve only the comments. If no scope is supplied, use the currently open or selected files; if that is unclear, ask for a scope before editing.
 
 Treat comments as durable documentation for a future maintainer:
 

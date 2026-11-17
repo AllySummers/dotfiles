@@ -1,8 +1,9 @@
 ---
+name: address-pr-comments
 description: Triage and fix review comments from a GitHub or Graphite PR URL.
 ---
 
-# fix-pr-comments
+# Address PR comments
 
 You are helping the user triage and fix comments on a GitHub or Graphite PR.
 

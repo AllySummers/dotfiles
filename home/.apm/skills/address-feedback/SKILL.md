@@ -1,8 +1,9 @@
 ---
+name: address-feedback
 description: Triage and fix PR review comments pasted into chat.
 ---
 
-# respond-to-pr-comments
+# Address review feedback
 
 You are helping the user triage and fix comments from a GitHub PR that they have pasted directly into the chat.
 
@@ -79,4 +80,4 @@ Present a clear summary table:
 
 - Only fix comments that are clearly valid — do not make speculative changes based on vague or ambiguous feedback without first flagging it as "needs decision".
 - If a file path is mentioned in the comment, read that file before making changes. If only a snippet or description is given, search the codebase to locate the relevant code.
-- Do not post any GitHub replies — this command works entirely offline from pasted input.
+- Do not post any GitHub replies — this skill works entirely offline from pasted input.

@@ -65,9 +65,11 @@ home/.config/mise/config.<os>.toml    -> ~/.config/mise/config.<os>.toml
 templates/editors/settings.jsonc (shared editor settings and portable mise path)
 templates/editors/cursor.json         (Cursor update mode and theme)
 templates/editors/vscode.json         (VS Code / Insiders update mode and theme)
+home/.vscode/extensions/cursor-dotfiles/ -> ~/.vscode/extensions/cursor-dotfiles
+                                       -> ~/.vscode-insiders/extensions/cursor-dotfiles
 ```
 
-Editor settings use mise JSONC merges (`merge = true`, `format = "jsonc"`). `templates/editors/settings.jsonc` holds shared settings and renders the platform-specific `mise.binPath`; `cursor.json` and `vscode.json` contain only `update.mode` and `workbench.colorTheme`. VS Code stable and Insiders use the same overrides. Comments and keys outside these sources stay in each editor's file. Managed keys are restored on apply; removing a key from a source leaves its existing value in the editor's file.
+Editor settings use mise JSONC merges (`merge = true`, `format = "jsonc"`). `templates/editors/settings.jsonc` holds shared settings and renders the platform-specific `mise.binPath`; `cursor.json` and `vscode.json` hold editor-specific overrides, including `update.mode` and `workbench.colorTheme`. VS Code stable and Insiders use the same overrides. Comments and keys outside these sources stay in each editor's file. Managed keys are restored on apply; removing a key from a source leaves its existing value in the editor's file.
 
 Editor merge entries live in `home/.config/mise/config.<os>.toml`, loaded through `auto_env`:
 
@@ -85,6 +87,27 @@ Preview or apply only the editor settings on macOS:
 mise dotfiles diff "$HOME/Library/Application Support/"{Cursor,Code,"Code - Insiders"}/User/settings.json
 mise dotfiles apply "$HOME/Library/Application Support/"{Cursor,Code,"Code - Insiders"}/User/settings.json
 ```
+
+The local **Cursor (Dotfiles)** theme is a standalone extension in
+`home/.vscode/extensions/cursor-dotfiles/`. It contains only a manifest and the
+combined theme JSON. Syntax rules and the default code-text colour come from
+`cursor-theme.json`; all other colours, including the editor background, come
+from `vscode-2026-theme.json`. The combined file is self-contained and does not
+depend on either temporary source file. Mise links the directory into both VS
+Code extension folders; the shared VS Code / Insiders overrides select it
+automatically.
+
+Install or update just the theme links:
+
+```sh
+mise dotfiles apply "$HOME/.vscode/extensions/cursor-dotfiles" "$HOME/.vscode-insiders/extensions/cursor-dotfiles"
+```
+
+Apply the editor settings as shown above on macOS (use the paths in the table on
+other platforms), or select **Cursor (Dotfiles)** with **Preferences: Color
+Theme**. Run **Developer: Reload Window** after installing or editing the theme;
+restart VS Code if the new extension is not discovered. No build or Marketplace
+installation is needed.
 
 On macOS, bootstrap applies custom icons to apps in `/Applications`:
 
