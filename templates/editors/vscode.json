@@ -1,4 +1,5 @@
 {
   "update.mode": "default",
-  "workbench.colorTheme": "Dark 2026"
+  "workbench.colorTheme": "Dark 2026",
+  "workbench.editor.useModal": "off"
 }
