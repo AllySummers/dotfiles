@@ -57,20 +57,20 @@ FAST_HIGHLIGHT[max-syntax-tokens]=100
 # versioned /usr/share/zsh/<version>/functions, and Linux distros differ again.
 # The check below is a single stat, so this is a no-op on every startup except
 # the first one and after a zsh upgrade moves the target.
-_git_completion_override="$ZSH_CONFIG_DIR/completions-override/_git"
-if [[ ! -e "$_git_completion_override" ]]; then
-  mkdir -p "${_git_completion_override:h}"
-  for _git_impl_dir in $fpath; do
-    [[ -r "$_git_impl_dir/_git" ]] || continue
-    grep -q '_git-checkout' "$_git_impl_dir/_git" 2>/dev/null || continue
-    ln -sf "$_git_impl_dir/_git" "$_git_completion_override"
-    break
-  done
-  unset _git_impl_dir
-fi
-unset _git_completion_override
-
-fpath=("$ZSH_CONFIG_DIR/completions-override" $fpath)
+# _git_completion_override="$ZSH_CONFIG_DIR/completions-override/_git"
+# if [[ ! -e "$_git_completion_override" ]]; then
+#   mkdir -p "${_git_completion_override:h}"
+#   for _git_impl_dir in $fpath; do
+#     [[ -r "$_git_impl_dir/_git" ]] || continue
+#     grep -q '_git-checkout' "$_git_impl_dir/_git" 2>/dev/null || continue
+#     ln -sf "$_git_impl_dir/_git" "$_git_completion_override"
+#     break
+#   done
+#   unset _git_impl_dir
+# fi
+# unset _git_completion_override
+#
+# fpath=("$ZSH_CONFIG_DIR/completions-override" $fpath)
 
 zstyle ':completion:*' list-colors "${(@s.:.)LS_COLORS}"
 zstyle ':completion:*:matches' group 'yes'
