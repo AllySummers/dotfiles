@@ -43,6 +43,10 @@ ENTIRE_TELEMETRY_OPTOUT = true
 "~/.cursor/hooks.json" = { mode = "symlink" }
 "~/.cursor/hooks" = { mode = "symlink-each", manifest = "git" }
 
+# Local theme extension, shared by VS Code stable and Insiders.
+"~/.vscode/extensions/cursor-dotfiles" = { mode = "symlink" }
+"~/.vscode-insiders/extensions/cursor-dotfiles" = { source = "~/.dotfiles/home/.vscode/extensions/cursor-dotfiles", mode = "symlink" }
+
 # Partial edits: mise only owns the keys in each file below; apps keep the rest.
 # With no `source`, a merge entry reads the target's path under dotfiles.root.
 # Graphite's ~/.config/graphite/user_config has no .json extension, and `merge`

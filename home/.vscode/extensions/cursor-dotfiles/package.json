@@ -1,0 +1,22 @@
+{
+  "name": "cursor-dotfiles",
+  "displayName": "Cursor (Dotfiles)",
+  "publisher": "dotfiles",
+  "version": "0.0.1",
+  "private": true,
+  "engines": {
+    "vscode": "^1.0.0"
+  },
+  "categories": [
+    "Themes"
+  ],
+  "contributes": {
+    "themes": [
+      {
+        "label": "Cursor (Dotfiles)",
+        "uiTheme": "vs-dark",
+        "path": "./cursor-color-theme.json"
+      }
+    ]
+  }
+}
