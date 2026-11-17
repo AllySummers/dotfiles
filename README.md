@@ -16,6 +16,95 @@ My personal dotfiles, managed with [mise](https://mise.jdx.dev) `[dotfiles]`.
 
 `mise run dotfiles:agent:setup --force` forwards `--force` to APM setup. Context7’s `ctx7` CLI installs on first use through mise; its setup may open a browser for authentication.
 
+## agent hooks and Atuin MCP
+
+```sh
+mise run dotfiles:agent:hooks     # disclosure hooks and Atuin command recording
+mise run agent:atuin-setup:hooks # install recording and disclosure hooks
+mise run agent:atuin-setup:mcp   # apply MCP registrations
+mise run agent:atuin-setup       # run both setup tasks in order
+```
+
+The disclosure task is TypeScript, run directly by the Node 26 already declared
+in the global mise config, using its native type stripping. Hook installation is
+a Bash task using jq. The Cursor Atuin adapter is also Bash, using jq, OpenSSL,
+and timeout, with its hook event supplied as a Usage argument. MCP configuration,
+the MCP server command, and the combined setup are TOML tasks.
+`agent:atuin-mcp` is a TOML task that runs `exec atuin mcp`, inheriting the global
+Atuin installation. Its stdio stays unprefixed. Agents launch it through the
+absolute mise path from the user's home, so project tasks cannot shadow it.
+
+`dotfiles:agent:setup` includes these hooks and Atuin MCP alongside the APM and
+Context7 setup. Bootstrap also installs the recording hooks. Restart agent
+sessions after applying; remote execution environments need their own setup.
+
+### Disclosure metadata
+
+| Agent | Refresh and evidence |
+|-------|----------------------|
+| Codex | `SessionStart`, `UserPromptSubmit`, `PreToolUse`, and `SubagentStart` report model metadata from that event |
+| Cursor | `sessionStart`, `beforeSubmitPrompt`, `postToolUse`, and `postToolUseFailure` report the host's model ID and client version |
+| Claude Code | `PreToolUse` and `PostToolUse` match `tool_use_id` to the exact assistant response in that agent's transcript |
+| GitHub Copilot | `sessionStart`, `userPromptTransformed`, and `postToolUse` inspect only the hook's matching session log |
+
+Claude's matching record supplies `message.model` and its recorded runtime
+`version`. Child tool calls use the child transcript, not the parent's newest
+response. Reads cover the last 4 MiB and retry briefly for a transcript write;
+a missing match stays unknown. `SessionStart` and `PostModelSwitch` use explicit
+host metadata when supplied. `SubagentStart` supplies an unknown model when the
+host omits it, avoiding inherited parent attribution. The switch hook requires
+Claude Code 2.1.251 or later. Its context is returned inside `hookSpecificOutput`,
+including for `PostModelSwitch`. A conversation with no tool calls can have an
+unknown model in the startup hook when the host omits it; explicit current model
+identity supplied separately by the host remains usable.
+
+Cursor refreshes context before every submitted prompt, including conversations
+without tools. This uses `additional_context`, verified in Cursor 3.31.3’s prompt
+hook validator and transport. Copilot appends metadata to the existing
+`transformedPrompt` through `modifiedTransformedPrompt`; command-based
+`userPromptSubmitted` output is not used. Tool-call IDs also let Copilot recover
+the actual response model, including when the selection is `auto`. Auto remains
+unknown before a response identifies its model. Codex refreshes at prompt submission,
+subagent start, and before tool calls; request hooks are diagnostic only.
+
+Observations include available session, agent, prompt, turn, and tool-call IDs.
+They identify the reported model for that observation, not a hidden revision or
+every model that contributed earlier. Adding hook context does not retroactively
+rewrite a pending outgoing message's arguments. No shared current-model cache is
+used. Auto and unresolved aliases remain unknown.
+
+For current versions not otherwise reported, command hooks inspect only their
+own process ancestors and query that exact CLI executable. They never substitute
+another installation found on PATH or label a runtime version as the GUI build.
+Copilot's session-creation version is labelled historical, not current. These
+log formats are internal interfaces and may change; no prompt contents are emitted.
+
+The canonical APM disclosure instruction uses `tool-version`. The normal
+`dotfiles:apm:setup` publishes that wording.
+
+### Atuin recording and search
+
+The setup task uses upstream `atuin hook install` for Claude Code, Codex, and
+Copilot. Codex's installer also maintains its hook trust entries. Claude's
+disclosure tool hooks are appended alongside existing hooks, preserving Atuin
+and user handlers instead of replacing their arrays.
+
+Cursor uses `agent:cursor-atuin` to record shell commands with
+`--author cursor --author-kind agent`. Its pending command state is keyed by
+conversation and tool-call IDs, so parallel conversations cannot overwrite one
+another. Mise renders the entire Cursor hooks config from
+`home/.cursor/hooks.json`; edit that source to change its hooks.
+
+Atuin MCP is registered through property merges for Codex, Claude Code, Cursor,
+Copilot (also used by VS Code's native Copilot harness), and Claude Desktop on
+macOS/Windows. Only the Atuin server entry is managed; existing servers remain.
+This setup does not enable optional command-output or conversation capture.
+
+References: [Atuin hooks](https://docs.atuin.sh/latest/guide/agent-hooks/),
+[Atuin MCP](https://docs.atuin.sh/latest/ai/mcp/),
+[mise merges](https://mise.jdx.dev/dotfiles/edits.html),
+[Claude hooks](https://code.claude.com/docs/en/hooks).
+
 ## quick start
 
 ```sh

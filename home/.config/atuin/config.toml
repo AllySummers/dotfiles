@@ -25,7 +25,7 @@ autostart = true
 # Using the literal username instead of "$all-user": Atuin's "$all-user"
 # special value only excludes its own built-in agent list (claude-code,
 # codex, copilot, pi). Cursor's agent commands are tagged author=cursor by
-# ~/.cursor/hooks/atuin-history.sh, and "cursor" isn't in that built-in list,
+# the agent:cursor-atuin mise task, and "cursor" isn't in that built-in list,
 # so "$all-user" alone would NOT hide them. Filtering by literal username
 # excludes cursor too (searchable via `atuin search --author cursor`).
 # Tradeoff: hardcodes the username, so this needs updating if it ever differs

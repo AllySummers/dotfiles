@@ -25,3 +25,37 @@ memories = true
 [memories]
 generate_memories = true
 use_memories = true
+
+# Disclosure events leave the Atuin tool hooks in hooks.json untouched.
+
+[[hooks.SessionStart]]
+
+[[hooks.SessionStart.hooks]]
+type = "command"
+command = '''{% if os() == 'windows' %}& "{{ env.HOME | replace(from='\\', to='/') }}/AppData/Local/mise/mise.exe"{% else %}"{{ env.HOME }}/.local/bin/mise"{% endif %} --cd "{{ env.HOME | replace(from='\\', to='/') }}" run --quiet --raw agent:disclosure codex'''
+timeout = 5
+
+[[hooks.UserPromptSubmit]]
+
+[[hooks.UserPromptSubmit.hooks]]
+type = "command"
+command = '''{% if os() == 'windows' %}& "{{ env.HOME | replace(from='\\', to='/') }}/AppData/Local/mise/mise.exe"{% else %}"{{ env.HOME }}/.local/bin/mise"{% endif %} --cd "{{ env.HOME | replace(from='\\', to='/') }}" run --quiet --raw agent:disclosure codex'''
+timeout = 5
+
+[[hooks.PreToolUse]]
+
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = '''{% if os() == 'windows' %}& "{{ env.HOME | replace(from='\\', to='/') }}/AppData/Local/mise/mise.exe"{% else %}"{{ env.HOME }}/.local/bin/mise"{% endif %} --cd "{{ env.HOME | replace(from='\\', to='/') }}" run --quiet --raw agent:disclosure codex'''
+timeout = 5
+
+[[hooks.SubagentStart]]
+
+[[hooks.SubagentStart.hooks]]
+type = "command"
+command = '''{% if os() == 'windows' %}& "{{ env.HOME | replace(from='\\', to='/') }}/AppData/Local/mise/mise.exe"{% else %}"{{ env.HOME }}/.local/bin/mise"{% endif %} --cd "{{ env.HOME | replace(from='\\', to='/') }}" run --quiet --raw agent:disclosure codex'''
+timeout = 5
+
+[mcp_servers.atuin]
+command = '''{% if os() == 'windows' %}{{ env.HOME | replace(from='\\', to='/') }}/AppData/Local/mise/mise.exe{% else %}{{ env.HOME }}/.local/bin/mise{% endif %}'''
+args = ['--cd', '''{{ env.HOME | replace(from='\\', to='/') }}''', 'run', '--quiet', '--raw', 'agent:atuin-mcp']

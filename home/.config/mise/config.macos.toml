@@ -328,3 +328,6 @@ depends_post = [{ task = "dotfiles:icons:refresh" }]
 "~/Library/Application Support/Code/User/settings.json/editor" = { source = "~/.dotfiles/templates/editors/vscode.json", merge = true, format = "jsonc" }
 "~/Library/Application Support/Code - Insiders/User/settings.json/shared" = { source = "~/.dotfiles/templates/editors/settings.jsonc", merge = true, format = "jsonc", template = "tera" }
 "~/Library/Application Support/Code - Insiders/User/settings.json/editor" = { source = "~/.dotfiles/templates/editors/vscode.json", merge = true, format = "jsonc" }
+
+# Claude Desktop uses a separate MCP config from Claude Code.
+"~/Library/Application Support/Claude/claude_desktop_config.json/atuin" = { source = "~/.dotfiles/templates/agents/atuin-mcp.json", merge = true, template = "tera" }

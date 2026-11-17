@@ -38,10 +38,15 @@ ENTIRE_TELEMETRY_OPTOUT = true
 "~/.config/mise/config.windows.toml" = { mode = "symlink" }
 # Copy APM sources as regular files while preserving its generated state.
 "~/.apm" = { mode = "copy" }
-# Only these two files are managed here -- ~/.cursor/ holds a lot of Cursor's
-# own app state, so it's deliberately not symlinked as a whole directory.
-"~/.cursor/hooks.json" = { mode = "symlink" }
-"~/.cursor/hooks" = { mode = "symlink-each", manifest = "git" }
+# Agent state directories stay app-owned; deploy only our scripts and hook keys.
+"~/.config/mise/tasks/agent" = { mode = "symlink-each" }
+"~/.cursor/hooks.json" = { mode = "template" }
+# Copilot composes separate files, so its disclosure hook needs no array merge.
+"~/.copilot/hooks/ai-disclosure.json" = { mode = "template" }
+# Only the Atuin server entry is owned; preserve each client's other servers.
+"~/.claude.json/atuin" = { source = "~/.dotfiles/templates/agents/atuin-mcp.json", merge = true, template = "tera" }
+"~/.cursor/mcp.json/atuin" = { source = "~/.dotfiles/templates/agents/atuin-mcp.json", merge = true, template = "tera" }
+"~/.copilot/mcp-config.json/atuin" = { source = "~/.dotfiles/templates/agents/atuin-copilot-mcp.json", merge = true, template = "tera" }
 
 # Local theme extension, shared by VS Code stable and Insiders.
 "~/.vscode/extensions/cursor-dotfiles" = { mode = "symlink" }
@@ -54,8 +59,8 @@ ENTIRE_TELEMETRY_OPTOUT = true
 # supported (the file excludes authToken/gtiConfigs):
 "~/.config/graphite/user_config/shared" = { merge = true, format = "json" }
 "~/.config/gh/config.yml/shared" = { merge = true }
-"~/.codex/config.toml/shared" = { merge = true }
-"~/.claude/settings.json/shared" = { merge = true }
+"~/.codex/config.toml/shared" = { merge = true, template = "tera" }
+"~/.claude/settings.json/shared" = { merge = true, template = "tera" }
 
 # Whole files (symlinked from ~/.dotfiles/home).
 "~/.config/kitty/kitty.conf" = { mode = "symlink" }
@@ -76,7 +81,7 @@ usage = "latest"
 "pipx:argcomplete" = "latest"
 
 # languages & runtimes
-node = "24"
+node = "26"
 "aqua:npm/cli" = "12.2.2"
 pnpm = "latest"
 deno = "latest"
@@ -217,8 +222,8 @@ depends = [{ tag = "bootstrap" }]
 
 [tasks."bootstrap:atuin-hooks"]
 tags = ["bootstrap"]
-description = "Install atuin agent hooks (claude-code, codex, pi)"
-run = ["atuin hook install claude-code", "atuin hook install codex", "atuin hook install pi"]
+description = "Install Atuin hooks for Claude Code, Codex, Copilot, and Cursor"
+run = [{ task = "agent:atuin-setup:hooks" }]
 
 [tasks."dotfiles:apm:setup"]
 description = "Copy APM config and install and compile global agent instructions"
@@ -233,8 +238,33 @@ run = [
   "apm compile --global",
 ]
 
+[tasks."agent:atuin-setup"]
+description = "Set up Atuin agent hooks and MCP registrations"
+run = [
+  { task = "agent:atuin-setup:hooks" },
+  { task = "agent:atuin-setup:mcp" },
+]
+
+[tasks."agent:atuin-setup:mcp"]
+description = "Apply Atuin MCP registrations for agent clients"
+run = '''mise dotfiles apply "{{ env.HOME }}/.codex/config.toml" "{{ env.HOME }}/.claude.json" "{{ env.HOME }}/.cursor/mcp.json" "{{ env.HOME }}/.copilot/mcp-config.json"{% if os() == "macos" %} "{{ env.HOME }}/Library/Application Support/Claude/claude_desktop_config.json"{% elif os() == "windows" %} "{{ env.HOME }}/AppData/Roaming/Claude/claude_desktop_config.json"{% endif %}'''
+
+[tasks."agent:atuin-mcp"]
+description = "Serve Atuin history tools over MCP stdio"
+raw = true
+quiet = true
+run = "exec atuin mcp"
+run_windows = "atuin mcp"
+
+[tasks."dotfiles:agent:hooks"]
+description = "Apply disclosure metadata and Atuin agent hooks"
+run = [
+  'mise dotfiles apply "{{ env.HOME }}/.config/mise/tasks/agent"',
+  { task = "agent:atuin-setup:hooks" },
+]
+
 [tasks."dotfiles:agent:setup"]
-description = "Set up global APM instructions and Context7 MCP for coding agents"
+description = "Set up global APM instructions, agent hooks, Atuin MCP, and Context7"
 raw = true
 usage = '''
 flag "-f --force" help="Pass --force to dotfiles:apm:setup"
@@ -243,6 +273,8 @@ flag "-f --force" help="Pass --force to dotfiles:apm:setup"
 # APM's copilot target covers CLI and IDE; Context7 configures them separately.
 run = [
   "mise run dotfiles:apm:setup{% if usage.force %} --force{% endif %}",
+  "mise run dotfiles:agent:hooks",
+  { task = "agent:atuin-setup:mcp" },
   "ctx7 setup --claude --cursor --vscode --copilot --codex --mcp --yes",
 ]
 

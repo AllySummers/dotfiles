@@ -15,7 +15,7 @@ eval "$(atuin init zsh --disable-up-arrow)"
 # Atuin's own "$all-user" author filter (and the [search] authors config
 # default) only excludes its hardcoded known-agent list (claude-code, codex,
 # copilot, pi) -- neither actually excludes "cursor" here. Cursor's agent
-# commands are tagged author=cursor by ~/.cursor/hooks/atuin-history.sh (see
+# commands are tagged author=cursor by the agent:cursor-atuin mise task (see
 # that script for why), so every interactive surface below filters by this
 # literal username explicitly instead of trusting "$all-user"/config
 # defaults. Confirmed by testing: an unfiltered `atuin search` and the

@@ -1,0 +1,8 @@
+{
+    "include": ["home/.config/mise"],
+    "compilerOptions": {
+        "types": ["node"],
+        "allowImportingTsExtensions": true,
+        "noEmit": true
+    }
+}
