@@ -5,22 +5,11 @@
 //USAGE arg "<agent>" help="Agent hook protocol" {
 //USAGE   choices "codex" "cursor" "claude" "copilot"
 //USAGE }
-//USAGE flag "--event <event>" help="Event for hosts that omit hook_event_name" {
-//USAGE   choices "sessionStart" "postToolUse" "userPromptTransformed"
-//USAGE }
 
 import process from 'node:process';
 import { Buffer } from 'node:buffer';
 import { execFileSync } from 'node:child_process';
-import {
-  closeSync,
-  fstatSync,
-  openSync,
-  readFileSync,
-  readSync,
-  realpathSync,
-  statSync,
-} from 'node:fs';
+import { readFileSync, realpathSync, statSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { basename, dirname, isAbsolute, join } from 'node:path';
 
@@ -33,7 +22,6 @@ interface HookInput {
   generation_id?: string;
   agentId?: string;
   toolCallId?: string;
-  transformedPrompt?: string;
   agent_id?: string;
   turn_id?: string;
   prompt_id?: string;
@@ -42,7 +30,6 @@ interface HookInput {
   agent_transcript_path?: string;
   model?: string;
   model_id?: string;
-  to_model?: string;
   cursor_version?: string;
 }
 interface Disclosure {
@@ -54,6 +41,34 @@ interface Disclosure {
   recordedVersion?: string;
   scope?: Record<string, string>;
 }
+
+// Agents run agent:disclosure-info, which prints this marker. Hooks stay silent
+// for every other tool call so metadata appears only when the model asks for it.
+const REQUEST_MARKER = '@@AI_DISCLOSURE_REQUEST@@';
+
+// Require the marker on its own line, so reading or searching files that merely
+// mention it (like this one) does not count as a request.
+const hasMarkerLine = (value: unknown): boolean => {
+  if (typeof value === 'string') {
+    if (value.split(/\r?\n/).some((line) => line.trim() === REQUEST_MARKER)) return true;
+    // Cursor's tool_output is a JSON string whose stdout has escaped newlines.
+    try {
+      const parsed: unknown = JSON.parse(value);
+      return typeof parsed === 'object' && hasMarkerLine(parsed);
+    } catch {
+      return false;
+    }
+  }
+  if (value && typeof value === 'object') return Object.values(value).some(hasMarkerLine);
+  return false;
+};
+
+// Claude and Codex send tool_response, Cursor tool_output, and Copilot toolResult
+// (or tool_result for PascalCase events).
+const requested = (input: HookInput) =>
+  ['tool_response', 'tool_output', 'toolResult', 'tool_result'].some((key) =>
+    hasMarkerLine(input[key])
+  );
 
 // Shared metadata formatting and CLI inspection
 
@@ -91,70 +106,79 @@ const disclosureContext = (
       ...(selected && !resolved ? { selection: selected } : {}),
       ...(recordedVersion ? { session_creation_tool_version: recordedVersion } : {}),
     }),
-    'Preserve reported model IDs verbatim. tool_version identifies the client/runtime, not a model snapshot. ' +
-    'Transcript matches identify the response that issued the specified tool call; other events report the selected model. ' +
-    'Metadata applies only to its supplied session, agent and call scope; do not inherit the parent model. ' +
-    'Do not reuse it after a model switch without fresh metadata. ' +
-    'An unavailable hook field means this hook did not observe it; it does not override explicit runtime metadata ' +
-    'supplied elsewhere for the same current session and agent. ' +
-    'Use unavailable only when no scoped runtime evidence supplies the value; do not substitute config defaults or another installation.',
+    'Use model IDs verbatim; tool_version is the client/runtime, not a model snapshot. ' +
+    'This applies only to the scope above; refresh it after a model switch. ' +
+    '"unavailable" means this hook did not observe the value; explicit runtime metadata for the same session and agent still applies.',
   ].join('\n');
 };
 
+// Canonical scope keys, each followed by the aliases other hosts use for it.
+const SCOPE_KEYS = [
+  ['session_id', 'conversation_id', 'sessionId'],
+  ['agent_id', 'agentId'],
+  ['turn_id'],
+  ['prompt_id'],
+  ['generation_id'],
+  ['tool_use_id', 'toolCallId'],
+] as const;
+
 const hookScope = (input: HookInput) => {
   const scope: Record<string, string> = {};
-  for (
-    const key of ['session_id', 'agent_id', 'turn_id', 'prompt_id', 'generation_id', 'tool_use_id']
-  ) {
-    const value = textValue(input[key]);
+  for (const [key, ...aliases] of SCOPE_KEYS) {
+    const value = [key, ...aliases].map((name) => textValue(input[name])).find(Boolean);
     if (value) scope[key] = value;
   }
-  const session = textValue(input.conversation_id ?? input.sessionId);
-  if (!scope.session_id && session) scope.session_id = session;
-  const agent = textValue(input.agentId);
-  if (!scope.agent_id && agent) scope.agent_id = agent;
-  const tool = textValue(input.toolCallId);
-  if (!scope.tool_use_id && tool) scope.tool_use_id = tool;
   return scope;
 };
 
+const VERSION_PATTERN = /\b\d+\.\d+\.\d+(?:[-+][\w.-]+)?\b/;
+
 // Inspect only this process's ancestors. A CLI found on PATH might be a different
 // installation from the one running the session (especially in Codex Desktop).
-const cliVersion = (tool: 'codex' | 'claude' | 'copilot') => {
+function* ancestors() {
   const platform = process.platform;
-  if (platform === 'win32') return undefined;
+  if (platform === 'win32') return;
   let pid = process.ppid;
   for (let depth = 0; pid > 1 && depth < 8; depth++) {
-    let executable;
     const currentPid = pid;
+    let executable: string | undefined;
     try {
       const row = execFileSync('/bin/ps', ['-p', String(pid), '-o', 'ppid=,comm='], {
         encoding: 'utf8',
         timeout: 300,
         stdio: ['ignore', 'pipe', 'ignore'],
       }).trim().match(/^(\d+)\s+(.+)$/);
-      if (!row) break;
+      if (!row) return;
       pid = Number(row[1]);
-      executable = row[2];
-      if (platform === 'linux') {
-        // Linux ps may abbreviate comm; /proc gives the actual executable.
-        executable = realpathSync('/proc/' + currentPid + '/exe');
-      }
-      const name = basename(executable);
-      const isCli = name === tool ||
-        (tool === 'claude' && /[/\\]claude[/\\]versions[/\\]/.test(executable));
-      if (!isAbsolute(executable) || !isCli) continue;
-      const output = execFileSync(executable, ['--version'], {
-        encoding: 'utf8',
-        timeout: 1500,
-        maxBuffer: 4096,
-        stdio: ['ignore', 'pipe', 'ignore'],
-      });
-      return textValue(output.match(/\b\d+\.\d+\.\d+(?:[-+][\w.-]+)?\b/)?.[0]);
+      executable = row[2] as string;
+      // Linux ps may abbreviate comm; /proc gives the actual executable.
+      if (platform === 'linux') executable = realpathSync('/proc/' + currentPid + '/exe');
     } catch {
       // Hooks must still supply the model when process inspection is unavailable.
-      if (!executable) break;
+      if (!executable) return;
     }
+    if (isAbsolute(executable)) yield { pid: currentPid, executable };
+  }
+}
+
+const executableVersion = (executable: string) => {
+  try {
+    const output = execFileSync(executable, ['--version'], {
+      encoding: 'utf8',
+      timeout: 1500,
+      maxBuffer: 4096,
+      stdio: ['ignore', 'pipe', 'ignore'],
+    });
+    return textValue(output.match(VERSION_PATTERN)?.[0]);
+  } catch {
+    return undefined;
+  }
+};
+
+// Codex's rollout log records only the version that created the session.
+const codexVersion = () => {
+  for (const { executable } of ancestors()) {
+    if (basename(executable) === 'codex') return executableVersion(executable);
   }
 };
 
@@ -165,9 +189,9 @@ const codexHookOutput = (input: HookInput) => {
   const context = disclosureContext({
     tool: 'Codex',
     model: input.model_id ?? input.model,
-    version: cliVersion('codex'),
+    version: codexVersion(),
     scope: hookScope(input),
-    source: String(event ?? 'sessionStart') + ' hook',
+    source: String(event ?? 'PostToolUse') + ' hook',
   });
   return { hookSpecificOutput: { hookEventName: event, additionalContext: context } };
 };
@@ -177,17 +201,12 @@ const codexHookOutput = (input: HookInput) => {
 const cursorHookOutput = (input: HookInput) => {
   const context = disclosureContext({
     tool: 'Cursor',
-    model: input.hook_event_name === 'PostModelSwitch'
-      ? input.to_model
-      : input.model_id ?? input.model,
+    model: input.model_id ?? input.model,
     version: input.cursor_version,
     scope: hookScope(input),
-    source: String(input.hook_event_name ?? 'sessionStart') + ' hook',
+    source: String(input.hook_event_name ?? 'postToolUse') + ' hook',
   });
-  return {
-    ...(input.hook_event_name === 'beforeSubmitPrompt' ? { continue: true } : {}),
-    additional_context: context,
-  };
+  return { additional_context: context };
 };
 
 // Claude Code
@@ -225,16 +244,8 @@ const claudeMetadata = async (input: HookInput): Promise<ClaudeObservation> => {
     file = explicit || (basename(transcript) === 'agent-' + agent + '.jsonl' ? transcript : child);
   }
   for (let attempt = 0; attempt < 4; attempt++) {
-    let fd;
     try {
-      fd = openSync(file, 'r');
-      const size = fstatSync(fd).size;
-      const offset = Math.max(0, size - 4 * 1024 * 1024);
-      const buffer = Buffer.alloc(size - offset);
-      const count = readSync(fd, buffer, 0, buffer.length, offset);
-      let tail = buffer.subarray(0, count).toString('utf8');
-      if (offset) tail = tail.slice(tail.indexOf('\n') + 1);
-      const lines = tail.split('\n');
+      const lines = readFileSync(file, 'utf8').split('\n');
       for (let index = lines.length - 1; index >= 0; index--) {
         let record: ClaudeTranscriptRecord;
         try {
@@ -256,8 +267,6 @@ const claudeMetadata = async (input: HookInput): Promise<ClaudeObservation> => {
       }
     } catch {
       /* The transcript can lag the hook or be unavailable. */
-    } finally {
-      if (fd !== undefined) closeSync(fd);
     }
     if (attempt < 3) await new Promise((resolve) => setTimeout(resolve, 25));
   }
@@ -269,13 +278,11 @@ const claudeHookOutput = async (input: HookInput) => {
   const observed = await claudeMetadata(input);
   const context = disclosureContext({
     tool: 'Claude Code',
-    model: event === 'PostModelSwitch' ? input.to_model : observed.model ?? input.model,
-    version: observed.version ?? cliVersion('claude'),
+    model: observed.model ?? input.model,
+    version: observed.version,
     scope: hookScope(input),
     source: observed.source ??
-      (input.tool_use_id
-        ? event + ' hook; matching transcript response unavailable'
-        : String(event ?? 'sessionStart') + ' hook'),
+      String(event ?? 'PostToolUse') + ' hook; matching transcript response unavailable',
   });
   return { hookSpecificOutput: { hookEventName: event, additionalContext: context } };
 };
@@ -297,6 +304,11 @@ interface CopilotEvent {
     newModel?: unknown;
     model?: unknown;
     toolRequests?: { toolCallId?: string }[];
+    usage?: {
+      model?: unknown;
+      parentToolCallId?: unknown;
+      toolCounts?: Record<string, unknown>;
+    };
   };
 }
 // Copilot does not include a model in its documented hook payload. Only inspect
@@ -308,17 +320,14 @@ const copilotMetadata = (
   const session = textValue(input.sessionId ?? input.session_id);
   if (!session || !/^[\w-]+$/.test(session)) return {};
   const file = join(root, 'session-state', session, 'events.jsonl');
-  let fd;
   try {
-    fd = openSync(file, 'r');
-    const size = statSync(file).size;
-    if (size > 16 * 1024 * 1024) return {};
-    const buffer = Buffer.alloc(size);
-    const count = readSync(fd, buffer, 0, size, 0);
+    const text = readFileSync(file, 'utf8');
     const result: CopilotObservation = {};
     const tool = textValue(input.toolCallId ?? input.tool_use_id);
+    const toolName = textValue(input.toolName);
     let response: CopilotObservation | undefined;
-    for (const line of buffer.subarray(0, count).toString('utf8').split('\n')) {
+    let usage: CopilotObservation | undefined;
+    for (const line of text.split('\n')) {
       let event: CopilotEvent;
       try {
         event = JSON.parse(line);
@@ -330,41 +339,100 @@ const copilotMetadata = (
         // This is the version recorded at session creation, not proof of the
         // current executable's version after resuming in another client.
         result.recordedVersion = textValue(event.data?.copilotVersion);
+      } else if (event.type === 'session.resume') {
+        result.model = textValue(event.data?.selectedModel) ?? result.model;
+        usage = undefined;
       } else if (event.type === 'session.model_change') {
         result.model = textValue(event.data?.newModel);
+        usage = undefined;
       } else if (
         event.type === 'assistant.message' && tool &&
         Array.isArray(event.data?.toolRequests) &&
         event.data.toolRequests.some((request) => request.toolCallId === tool)
       ) {
-        response = {
-          model: textValue(event.data.model),
-          source: 'Copilot transcript response matched by toolCallId',
-        };
+        // Some responses record no model; keep the session selection for those.
+        const model = textValue(event.data.model);
+        response = model
+          ? { model, source: 'Copilot transcript response matched by toolCallId' }
+          : undefined;
+      } else if (
+        event.type === 'session.usage_record' && !input.agentId && toolName &&
+        !event.data?.usage?.parentToolCallId &&
+        Number(event.data?.usage?.toolCounts?.[toolName]) > 0
+      ) {
+        // Fused (auto) turns append the response only after the phase ends, so the
+        // hook cannot match it yet. The request's usage record is already written.
+        const model = textValue(event.data?.usage?.model);
+        usage = model
+          ? { model, source: 'latest root Copilot usage record requesting ' + toolName }
+          : undefined;
       }
     }
-    return { ...result, ...response };
+    return { ...result, ...(response ?? usage) };
   } catch {
     return {};
-  } finally {
-    if (fd !== undefined) closeSync(fd);
+  }
+};
+
+const RUNTIME_PACKAGE = Buffer.from('@github/copilot');
+const RUNTIME_VERSION = /^(\d+\.\d+\.\d+(?:-[0-9A-Za-z.]+?)?)BuildCommitId/;
+
+// runtime.node, loaded by copilot-runtime, embeds its package version next to
+// its build metadata.
+const embeddedRuntimeVersion = (pid: number, executable: string) => {
+  const library = join(dirname(executable), 'runtime.node');
+  try {
+    const started = Date.parse(
+      execFileSync('/bin/ps', ['-p', String(pid), '-o', 'lstart='], {
+        encoding: 'utf8',
+        timeout: 300,
+        env: { ...process.env, LC_ALL: 'C' },
+        stdio: ['ignore', 'pipe', 'ignore'],
+      }).trim(),
+    );
+    // An app update can replace the file under an older runtime that is still running.
+    if (!(statSync(library).mtimeMs < started + 1000)) return undefined;
+    const bytes = readFileSync(library);
+    for (
+      let at = bytes.indexOf(RUNTIME_PACKAGE);
+      at !== -1;
+      at = bytes.indexOf(RUNTIME_PACKAGE, at + 1)
+    ) {
+      const start = at + RUNTIME_PACKAGE.length;
+      const marker = bytes.subarray(start, start + 64).toString('latin1');
+      const version = marker.match(RUNTIME_VERSION)?.[1];
+      if (version) return textValue(version);
+    }
+  } catch {
+    // Report unavailable rather than guess.
+  }
+};
+
+// The CLI is `copilot`; the VS Code and desktop SDKs run `copilot-runtime`, which
+// has no --version. Desktop installs it under a versioned cache directory.
+const copilotVersion = () => {
+  for (const { pid, executable } of ancestors()) {
+    const name = basename(executable);
+    if (name === 'copilot') return executableVersion(executable);
+    if (name !== 'copilot-runtime') continue;
+    const versioned = basename(dirname(executable)).match(/^copilot-sdk-runtime-(.+)$/)?.[1];
+    if (versioned && VERSION_PATTERN.test(versioned)) return textValue(versioned);
+    return embeddedRuntimeVersion(pid, executable);
   }
 };
 
 const copilotHookOutput = (input: HookInput) => {
-  const observed = copilotMetadata(input);
+  const root = process.env.COPILOT_HOME || join(homedir(), '.copilot');
+  const observed = copilotMetadata(input, root);
+  const version = copilotVersion();
   const context = disclosureContext({
     tool: 'GitHub Copilot',
     model: observed.model,
-    version: cliVersion('copilot'),
-    recordedVersion: observed.recordedVersion,
+    version,
+    recordedVersion: version ? undefined : observed.recordedVersion,
     scope: hookScope(input),
     source: observed.source ?? 'matching Copilot session log selection',
   });
-  if (input.hook_event_name === 'userPromptTransformed') {
-    if (typeof input.transformedPrompt !== 'string') return {};
-    return { modifiedTransformedPrompt: input.transformedPrompt + '\n\n' + context };
-  }
   return { additionalContext: context };
 };
 
@@ -373,23 +441,24 @@ try {
   if (!input || typeof input !== 'object' || Array.isArray(input)) {
     throw new Error('Invalid hook input');
   }
-  input.hook_event_name ??= process.env.usage_event;
-  let output;
-  switch (process.env.usage_agent) {
-    case 'codex':
-      output = codexHookOutput(input);
-      break;
-    case 'cursor':
-      output = cursorHookOutput(input);
-      break;
-    case 'claude':
-      output = await claudeHookOutput(input);
-      break;
-    case 'copilot':
-      output = copilotHookOutput(input);
-      break;
-    default:
-      throw new Error('Unknown agent hook protocol');
+  let output = {};
+  if (requested(input)) {
+    switch (process.env.usage_agent) {
+      case 'codex':
+        output = codexHookOutput(input);
+        break;
+      case 'cursor':
+        output = cursorHookOutput(input);
+        break;
+      case 'claude':
+        output = await claudeHookOutput(input);
+        break;
+      case 'copilot':
+        output = copilotHookOutput(input);
+        break;
+      default:
+        throw new Error('Unknown agent hook protocol');
+    }
   }
   process.stdout.write(JSON.stringify(output) + '\n');
 } catch {

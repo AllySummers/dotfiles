@@ -40,32 +40,30 @@ sessions after applying; remote execution environments need their own setup.
 
 ### Disclosure metadata
 
-| Agent | Refresh and evidence |
-|-------|----------------------|
-| Codex | `SessionStart`, `UserPromptSubmit`, `PreToolUse`, and `SubagentStart` report model metadata from that event |
-| Cursor | `sessionStart`, `beforeSubmitPrompt`, `postToolUse`, and `postToolUseFailure` report the host's model ID and client version |
-| Claude Code | `PreToolUse` and `PostToolUse` match `tool_use_id` to the exact assistant response in that agent's transcript |
-| GitHub Copilot | `sessionStart`, `userPromptTransformed`, and `postToolUse` inspect only the hook's matching session log |
+Agents see disclosure metadata only when they ask for it. The instruction tells
+them to run `mise -C ~ run agent:disclosure-info` before writing a footer. That
+task prints a marker, and each agent's post-tool hook runs `agent:disclosure`,
+which replies only when a line of the tool output is exactly the marker, so
+reading files that mention it does not count. Every other tool
+call gets no context, and the hook never parses the command line.
+
+| Agent | Hook and evidence |
+|-------|-------------------|
+| Codex | `PostToolUse` (`Bash`) reports the model from the hook input |
+| Cursor | `postToolUse` (`Shell`) reports the host's model ID and client version |
+| Claude Code | `PostToolUse` (`Bash\|PowerShell`) matches `tool_use_id` to the exact assistant response in that agent's transcript |
+| GitHub Copilot | `postToolUse` (`bash\|powershell`) matches `toolCallId` in the hook's own session log, falling back to its selection |
 
 Claude's matching record supplies `message.model` and its recorded runtime
 `version`. Child tool calls use the child transcript, not the parent's newest
-response. Reads cover the last 4 MiB and retry briefly for a transcript write;
-a missing match stays unknown. `SessionStart` and `PostModelSwitch` use explicit
-host metadata when supplied. `SubagentStart` supplies an unknown model when the
-host omits it, avoiding inherited parent attribution. The switch hook requires
-Claude Code 2.1.251 or later. Its context is returned inside `hookSpecificOutput`,
-including for `PostModelSwitch`. A conversation with no tool calls can have an
-unknown model in the startup hook when the host omits it; explicit current model
-identity supplied separately by the host remains usable.
+response. Reads retry briefly for a transcript write;
+a missing match stays unknown. Claude's source keeps the command under
+`SessionStart` only so the hook installer can copy the rendered command; the
+script returns nothing for that event.
 
-Cursor refreshes context before every submitted prompt, including conversations
-without tools. This uses `additional_context`, verified in Cursor 3.31.3’s prompt
-hook validator and transport. Copilot appends metadata to the existing
-`transformedPrompt` through `modifiedTransformedPrompt`; command-based
-`userPromptSubmitted` output is not used. Tool-call IDs also let Copilot recover
-the actual response model, including when the selection is `auto`. Auto remains
-unknown before a response identifies its model. Codex refreshes at prompt submission,
-subagent start, and before tool calls; request hooks are diagnostic only.
+Codex and Claude settings are merged, and merges never delete keys, so their
+sources set events earlier versions used to empty arrays. Codex asks you to
+trust the new `PostToolUse` hook in `/hooks`.
 
 Observations include available session, agent, prompt, turn, and tool-call IDs.
 They identify the reported model for that observation, not a hidden revision or
@@ -73,7 +71,7 @@ every model that contributed earlier. Adding hook context does not retroactively
 rewrite a pending outgoing message's arguments. No shared current-model cache is
 used. Auto and unresolved aliases remain unknown.
 
-For current versions not otherwise reported, command hooks inspect only their
+For current Codex and Copilot versions, command hooks inspect only their
 own process ancestors and query that exact CLI executable. They never substitute
 another installation found on PATH or label a runtime version as the GUI build.
 Copilot's session-creation version is labelled historical, not current. These
@@ -86,7 +84,7 @@ The canonical APM disclosure instruction uses `tool-version`. The normal
 
 The setup task uses upstream `atuin hook install` for Claude Code, Codex, and
 Copilot. Codex's installer also maintains its hook trust entries. Claude's
-disclosure tool hooks are appended alongside existing hooks, preserving Atuin
+disclosure `PostToolUse` hook is appended alongside existing hooks, preserving Atuin
 and user handlers instead of replacing their arrays.
 
 Cursor uses `agent:cursor-atuin` to record shell commands with

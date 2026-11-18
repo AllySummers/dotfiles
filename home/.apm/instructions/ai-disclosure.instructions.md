@@ -47,6 +47,11 @@ unless the runtime explicitly reports it. Metadata is an observation at its
 named lifecycle event: refresh it after a model switch before reusing it.
 Use “unavailable” for unknown values.
 
+To get the footer values, run `mise -C ~ run agent:disclosure-info` as its own
+shell command, without pipes or redirects, right before writing the footer. The
+disclosure hook adds the metadata to that command's result. Run it again for
+each post, since the model can change between calls.
+
 Disclosure is optional when you know you are using a separate account clearly
 identified as an AI or bot account. If unsure whether the account is a bot,
 include it. Never imply human review or approval unless it actually occurred.

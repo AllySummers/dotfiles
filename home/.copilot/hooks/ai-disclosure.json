@@ -1,24 +1,11 @@
 {
   "version": 1,
   "hooks": {
-    "sessionStart": [
-      {
-        "type": "command",
-        "command": "{% if os() == 'windows' %}& \"{{ env.HOME | replace(from='\\\\', to='/') }}/AppData/Local/mise/mise.exe\"{% else %}\"{{ env.HOME }}/.local/bin/mise\"{% endif %} --cd \"{{ env.HOME | replace(from='\\\\', to='/') }}\" run --quiet --raw agent:disclosure copilot --event sessionStart",
-        "timeoutSec": 5
-      }
-    ],
     "postToolUse": [
       {
         "type": "command",
-        "command": "{% if os() == 'windows' %}& \"{{ env.HOME | replace(from='\\\\', to='/') }}/AppData/Local/mise/mise.exe\"{% else %}\"{{ env.HOME }}/.local/bin/mise\"{% endif %} --cd \"{{ env.HOME | replace(from='\\\\', to='/') }}\" run --quiet --raw agent:disclosure copilot --event postToolUse",
-        "timeoutSec": 5
-      }
-    ],
-    "userPromptTransformed": [
-      {
-        "type": "command",
-        "command": "{% if os() == 'windows' %}& \"{{ env.HOME | replace(from='\\\\', to='/') }}/AppData/Local/mise/mise.exe\"{% else %}\"{{ env.HOME }}/.local/bin/mise\"{% endif %} --cd \"{{ env.HOME | replace(from='\\\\', to='/') }}\" run --quiet --raw agent:disclosure copilot --event userPromptTransformed",
+        "matcher": "bash|powershell",
+        "command": "{% if os() == 'windows' %}& \"{{ env.HOME | replace(from='\\\\', to='/') }}/AppData/Local/mise/mise.exe\"{% else %}\"{{ env.HOME }}/.local/bin/mise\"{% endif %} --cd \"{{ env.HOME | replace(from='\\\\', to='/') }}\" run --quiet --raw agent:disclosure copilot",
         "timeoutSec": 5
       }
     ]

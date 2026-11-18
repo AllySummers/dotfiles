@@ -15,16 +15,6 @@
         ]
       }
     ],
-    "PostModelSwitch": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "{% if os() == 'windows' %}& \"{{ env.HOME | replace(from='\\\\', to='/') }}/AppData/Local/mise/mise.exe\"{% else %}\"{{ env.HOME }}/.local/bin/mise\"{% endif %} --cd \"{{ env.HOME | replace(from='\\\\', to='/') }}\" run --quiet --raw agent:disclosure claude",
-            "timeout": 5
-          }
-        ]
-      }
-    ]
+    "PostModelSwitch": []
   }
 }

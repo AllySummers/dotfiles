@@ -256,6 +256,13 @@ quiet = true
 run = "exec atuin mcp"
 run_windows = "atuin mcp"
 
+# Agents run this before writing an AI disclosure footer. Its output carries the
+# marker that makes the agent:disclosure post-tool hook reply with model metadata.
+[tasks."agent:disclosure-info"]
+description = "Request AI disclosure footer values from the agent hook"
+quiet = true
+run = "echo '@@AI_DISCLOSURE_REQUEST@@'"
+
 [tasks."dotfiles:agent:hooks"]
 description = "Apply disclosure metadata and Atuin agent hooks"
 run = [

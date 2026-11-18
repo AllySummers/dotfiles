@@ -13,26 +13,14 @@
         "matcher": "Shell"
       },
       {
-        "command": "{% if os() == 'windows' %}& \"{{ env.HOME | replace(from='\\\\', to='/') }}/AppData/Local/mise/mise.exe\"{% else %}\"{{ env.HOME }}/.local/bin/mise\"{% endif %} --cd \"{{ env.HOME | replace(from='\\\\', to='/') }}\" run --quiet --raw agent:disclosure cursor"
+        "command": "{% if os() == 'windows' %}& \"{{ env.HOME | replace(from='\\\\', to='/') }}/AppData/Local/mise/mise.exe\"{% else %}\"{{ env.HOME }}/.local/bin/mise\"{% endif %} --cd \"{{ env.HOME | replace(from='\\\\', to='/') }}\" run --quiet --raw agent:disclosure cursor",
+        "matcher": "Shell"
       }
     ],
     "postToolUseFailure": [
       {
         "command": "{% if os() == 'windows' %}& \"{{ env.HOME | replace(from='\\\\', to='/') }}/AppData/Local/mise/mise.exe\"{% else %}\"{{ env.HOME }}/.local/bin/mise\"{% endif %} --cd \"{{ env.HOME | replace(from='\\\\', to='/') }}\" run --quiet --raw agent:cursor-atuin postToolUseFailure",
         "matcher": "Shell"
-      },
-      {
-        "command": "{% if os() == 'windows' %}& \"{{ env.HOME | replace(from='\\\\', to='/') }}/AppData/Local/mise/mise.exe\"{% else %}\"{{ env.HOME }}/.local/bin/mise\"{% endif %} --cd \"{{ env.HOME | replace(from='\\\\', to='/') }}\" run --quiet --raw agent:disclosure cursor"
-      }
-    ],
-    "sessionStart": [
-      {
-        "command": "{% if os() == 'windows' %}& \"{{ env.HOME | replace(from='\\\\', to='/') }}/AppData/Local/mise/mise.exe\"{% else %}\"{{ env.HOME }}/.local/bin/mise\"{% endif %} --cd \"{{ env.HOME | replace(from='\\\\', to='/') }}\" run --quiet --raw agent:disclosure cursor"
-      }
-    ],
-    "beforeSubmitPrompt": [
-      {
-        "command": "{% if os() == 'windows' %}& \"{{ env.HOME | replace(from='\\\\', to='/') }}/AppData/Local/mise/mise.exe\"{% else %}\"{{ env.HOME }}/.local/bin/mise\"{% endif %} --cd \"{{ env.HOME | replace(from='\\\\', to='/') }}\" run --quiet --raw agent:disclosure cursor"
       }
     ]
   }

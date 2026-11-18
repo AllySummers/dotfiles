@@ -16,7 +16,9 @@ for agent in claude-code codex copilot; do
   atuin hook install "$agent"
 done
 
-# Append disclosure handlers without replacing Atuin or user hook arrays.
+# Append the disclosure handler without replacing Atuin or user hook arrays.
+# SessionStart in the source only carries the rendered command, and the script
+# answers it with nothing. Copies earlier versions added to other events are removed.
 settings="$HOME/.claude/settings.json"
 temp=$(mktemp "$settings.disclosure.XXXXXX")
 trap 'rm -f "$temp"' EXIT
@@ -26,11 +28,14 @@ jq '
   if $command == null then
     error("Apply the Claude disclosure source before installing its tool hooks")
   else
-    reduce ["PreToolUse", "PostToolUse", "SubagentStart"][] as $event (.;
-      .hooks[$event] //= [] |
-      if any(.hooks[$event][]?.hooks[]?; .command == $command) then .
-      else .hooks[$event] += [{hooks: [{type: "command", command: $command, timeout: 5}]}]
-      end)
+    .hooks |= with_entries(
+      if .key == "SessionStart" then .
+      else .value |= map(.hooks = [.hooks[]? | select(.command != $command)] | select(.hooks | length > 0))
+      end) |
+    .hooks.PostToolUse += [{
+      matcher: "Bash|PowerShell",
+      hooks: [{type: "command", command: $command, timeout: 5}]
+    }]
   end
 ' "$settings" > "$temp"
 if ! cmp -s "$settings" "$temp"; then
