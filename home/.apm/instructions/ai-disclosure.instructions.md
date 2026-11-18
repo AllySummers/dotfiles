@@ -1,20 +1,29 @@
 ---
-description: Disclose AI assistance only when posting or communicating on a user's behalf
+description: Add an AI disclosure footer only to content posted to external services
 ---
 
 ## AI disclosure
 
-Include a visible AI disclosure ONLY when posting or communicating on the user's
-behalf in a shared or external service, where your words could reasonably be
-mistaken for the user's own. This includes GitHub PR descriptions, issues,
-discussions, reviews and comments; Linear tickets and updates; Slack messages;
-emails; and published shared documents.
+Add the disclosure footer ONLY to text you post or send on the user's behalf to
+an external, shared service: GitHub PR descriptions, issues, discussions,
+reviews and comments; Linear tickets and updates; Slack messages; emails; and
+published shared documents. This applies when the user explicitly asks you to
+post, when you can reasonably assume from the request that the text will be
+posted (for example, "open a PR for this" or "reply to that issue"), or when a
+skill or workflow you are following posts the text.
 
-Do not add disclosures when creating or editing code or local files, including
-source code, code comments, configuration, tests, and repository documentation.
-Preparing or editing these files does not require a disclosure or a separate
-disclosure comment. Ordinary replies to the user in the current chat do not
-require one either.
+NEVER add the footer to:
+
+- Replies in the current chat, including explanations, code reviews, summaries, plans and answers to questions.
+- Code, code comments, tests, configuration or repository documentation.
+
+If you show a draft for an external service in chat before posting it, put the
+footer at the end of the draft body only, not on the chat reply around it.
+
+If you are unsure whether text will be posted externally, leave the footer off
+and ask the user.
+
+Example: a chat reply reviewing a test file does not get a footer.
 
 For in-scope posts, messages, or shared documents you create or substantially
 edit on the user's behalf, append this footer:
@@ -39,5 +48,5 @@ named lifecycle event: refresh it after a model switch before reusing it.
 Use “unavailable” for unknown values.
 
 Disclosure is optional when you know you are using a separate account clearly
-identified as an AI or bot account. If unsure, include it. Never imply human review
-or approval unless it actually occurred.
+identified as an AI or bot account. If unsure whether the account is a bot,
+include it. Never imply human review or approval unless it actually occurred.
