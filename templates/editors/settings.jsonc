@@ -88,7 +88,6 @@
   "git.openRepositoryInParentFolders": "never",
   "github.authenticationProvider": "github",
   "github.copilot.advanced": {
-    "authProvider": "github",
     "enableRemoteAgents": true,
     "useLanguageServer": true
   },

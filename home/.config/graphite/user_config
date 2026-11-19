@@ -6,6 +6,5 @@
   "allowUpperCaseInGeneratedBranchNames": false,
   "pager": "bat -p",
   "updateAutomatically": false,
-  "deleteMergedOrClosedBranchesInSync": false,
   "promptForUpdates": false
 }
