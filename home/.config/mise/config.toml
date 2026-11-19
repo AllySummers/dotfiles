@@ -282,29 +282,8 @@ run = [
   "mise run dotfiles:apm:setup{% if usage.force %} --force{% endif %}",
   { task = "dotfiles:agent:hooks" },
   { task = "agent:atuin-setup:mcp" },
-  "ctx7 setup --claude --cursor --vscode --copilot --codex --mcp --yes",
-  { task = "agent:context7-setup:vscode-insiders" },
+  "ctx7 setup --claude --cursor --vscode --copilot --codex --mcp --yes"
 ]
-
-# Temporary until https://github.com/upstash/context7/issues/3872 is fixed.
-[tasks."agent:context7-setup:vscode-insiders"]
-description = "Copy the Context7 MCP entry from VS Code stable to Insiders"
-skip_if = '''test "{{ os() }}" != macos'''
-run = '''
-set -eu
-stable="$HOME/Library/Application Support/Code/User/mcp.json"
-insiders="$HOME/Library/Application Support/Code - Insiders/User/mcp.json"
-mkdir -p "$(dirname "$insiders")"
-existing=/dev/null
-if [ -e "$insiders" ]; then existing="$insiders"; fi
-updated=$(jq -es --slurpfile stable "$stable" '
-  ($stable[0].servers.context7 | objects) as $context7
-  | (.[0] // {})
-  | .servers.context7 = $context7
-' "$existing")
-umask 077
-printf '%s\n' "$updated" > "$insiders"
-'''
 
 [tasks."git:remotes"]
 description = "Convert GitHub remotes to SSH or HTTPS"
