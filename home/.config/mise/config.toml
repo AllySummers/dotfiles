@@ -231,7 +231,7 @@ usage = '''
 flag "-f --force" help="Force APM install and replace Copilot and Codex global AGENTS.md files"
 '''
 run = [
-  'mise dotfiles apply "{{ env.HOME }}/.apm"',
+  'mise dotfiles apply --force --yes "{{ env.HOME }}/.apm"',
   "apm install --global{% if usage.force %} --force{% endif %}",
   # they don't support instructions files so they just get deleted i guess
   '{% if usage.force %}rm -fv "{{ env.HOME }}/.copilot/AGENTS.md" "{{ env.HOME }}/.codex/AGENTS.md"{% endif %}',
@@ -280,10 +280,31 @@ flag "-f --force" help="Pass --force to dotfiles:apm:setup"
 # APM's copilot target covers CLI and IDE; Context7 configures them separately.
 run = [
   "mise run dotfiles:apm:setup{% if usage.force %} --force{% endif %}",
-  "mise run dotfiles:agent:hooks",
+  { task = "dotfiles:agent:hooks" },
   { task = "agent:atuin-setup:mcp" },
   "ctx7 setup --claude --cursor --vscode --copilot --codex --mcp --yes",
+  { task = "agent:context7-setup:vscode-insiders" },
 ]
+
+# Temporary until https://github.com/upstash/context7/issues/3872 is fixed.
+[tasks."agent:context7-setup:vscode-insiders"]
+description = "Copy the Context7 MCP entry from VS Code stable to Insiders"
+skip_if = '''test "{{ os() }}" != macos'''
+run = '''
+set -eu
+stable="$HOME/Library/Application Support/Code/User/mcp.json"
+insiders="$HOME/Library/Application Support/Code - Insiders/User/mcp.json"
+mkdir -p "$(dirname "$insiders")"
+existing=/dev/null
+if [ -e "$insiders" ]; then existing="$insiders"; fi
+updated=$(jq -es --slurpfile stable "$stable" '
+  ($stable[0].servers.context7 | objects) as $context7
+  | (.[0] // {})
+  | .servers.context7 = $context7
+' "$existing")
+umask 077
+printf '%s\n' "$updated" > "$insiders"
+'''
 
 [tasks."git:remotes"]
 description = "Convert GitHub remotes to SSH or HTTPS"
