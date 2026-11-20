@@ -1,4 +1,7 @@
 {
+  "chat.agentFilesLocations": {
+    "~/.copilot/agents": true
+  },
   "chat.permissions.assisted.instructions": "For the task I requested, approve workspace searches, Git and stack inspection, GitHub PR/issue reads, Context7 public documentation lookups, and fetches from approved documentation sites. Approve mise task/tool discovery and the home agent:disclosure-info task. In trusted workspaces, approve local tests, lint and typechecks when the underlying task only performs those checks. Ask before installs, arbitrary scripts, destructive changes, commits, pushes, publishing, external writes, or sending private data to a new destination. A request to review or draft is not permission to post.",
   "chat.tools.terminal.autoApprove": {
     "/^mise -C ~ run agent:disclosure-info$/": true,

@@ -14,4 +14,13 @@ dependencies:
     - path: ~/.apm/skills/address-pr-comments
     - path: ~/.apm/skills/address-feedback
     - path: ~/.apm/skills/write-better-comments
+    - path: ~/.apm/skills/clarify-docs
+    - path: ~/.apm/skills/simplify-code
+    - path: ~/.apm/skills/simplify-tests
+    - path: ~/.apm/skills/code-review
+    - path: ~/.apm/skills/cross-model-review
+    - path: ~/.apm/packages/cursor-reviewers
+      targets: [cursor]
+    - path: ~/.apm/packages/copilot-reviewers
+      targets: [copilot]
     - github/gh-stack/skills/gh-stack

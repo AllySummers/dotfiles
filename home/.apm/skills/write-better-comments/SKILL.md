@@ -1,26 +1,16 @@
 ---
 name: write-better-comments
-description: Improve existing code comments within the requested scope without changing code.
+description: Review or rewrite existing inline comments, docstrings, and API doc comments in source files for clarity, accuracy, and lasting value.
 ---
 
-# Write Better Comments
+# Write better comments
 
-Review the existing comments in the files or directories supplied with the request and improve only the comments. If no scope is supplied, use the currently open or selected files; if that is unclear, ask for a scope before editing.
+Use the files or selection the user identified. If the target is unclear, ask which comments to review. In a review, recommend changes. For a comments-only cleanup, edit existing comments and leave executable code alone. Suggest a rename, refactor, or missing comment separately when it would help.
 
-Treat comments as durable documentation for a future maintainer:
+## Review criteria
 
-- Remove comments that merely restate the code, narrate obvious implementation details, or describe the task, plan, refactor history, or agent reasoning.
-- Rewrite useful comments to be concise, local, and evergreen. Keep comments only when they explain a non-obvious constraint, invariant, workaround, trade-off, or externally imposed behaviour.
-- Prefer clear names, types, and small functions over explanatory comments. Do not change executable code merely to avoid a comment.
-- Preserve and improve meaningful API documentation; do not delete documentation just because it is longer than an inline comment.
-- GitHub or Linear issue references are allowed for a durable workaround, follow-up, or removal condition, but the comment must state the essential reason without requiring the reader to open the issue.
-
-Examples:
-
-```ts
-// Bad: This was added in step 3 of the migration plan.
-// Bad: Loop through users and add each user to the result.
-// Good: The provider may return 404 while a new object is propagating; retry briefly. See GH-482.
-```
-
-Do not add comments while doing this pass. After editing, report the files reviewed and briefly summarize comments removed or rewritten.
+- Read the surrounding code and check the claim. Remove comments that narrate obvious steps, describe the author's process, or repeat a name or type. Replace stale history with the constraint that still matters.
+- Keep the detail a future maintainer could accidentally break. Explain a non-obvious invariant, trade-off, workaround, or externally imposed behavior close to the decision it affects. For example, “The provider can return 404 briefly after creation, so retry this lookup” explains why the retry belongs here.
+- Use ordinary words and the same names as the code. If a clearer identifier would carry the whole meaning, recommend it. When an issue or specification explains a workaround, include the essential reason in the comment and use the link for further detail or its removal condition.
+- Preserve meaningful API documentation about units, ownership, errors, side effects, or obligations callers cannot infer from a signature. A useful public example can earn its length.
+- Check whether tools consume a comment before editing it. Preserve the parts that tools rely on and their placement. For type directives, lint suppressions, build tags, doctests, generated-file markers, and license notices, edit only the surrounding explanatory prose.
