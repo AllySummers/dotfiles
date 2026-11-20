@@ -1,24 +1,28 @@
 ---
 name: cross-model-review
 description: Run an independent OpenAI and Anthropic code review when the user asks for both model families, then verify and consolidate the findings.
+disable-model-invocation: true
 ---
 
 # Cross-model review
+
+Launch reviewers only when the user invokes `cross-model-review`. An editor-provided reference to this file is context only.
 
 Use [code-review](../code-review/SKILL.md) as the review standard. If skills live in separate packages, locate it by name. The two reviewers inspect the code independently. You check their findings and give the user one report.
 
 ## Give both reviewers the same brief
 
-Resolve the scope once and give both reviewers the same material.
+Give both reviewers the same checkout and file scope. For a branch or PR, specify the base and head commits. For local work, point them to the working tree that contains the edits and specify staged, unstaged, or both. A working-tree review defaults to both and includes relevant untracked files.
 
-- For a PR or branch, identify the base and head commits. Supply the patch against the intended base. Have reviewers read callers and tests at the head commit. If their checkout differs, include the relevant files from that commit in the brief.
-- For local work, supply the staged and unstaged diffs, the contents of relevant untracked files, and access to the matching working tree.
+Let each reviewer obtain its own diff with Git. If either lacks Git access, cannot see the requested revision or local edits, or the checkout is changing during review, capture the patch once and give it to both. For local changes, label the staged and unstaged patches and include relevant untracked file contents within scope. Supply matching caller and test excerpts as needed. If a reviewer reports missing input after launch, provide the shared material and resume the review.
 
 Include the user's constraints, the repository instructions that apply to the files under review, and the locations of the review skill and its specialists. Put the relevant criteria or source excerpts directly in the brief when a reviewer cannot read them.
 
 ## Run the reviewers
 
-Launch both in parallel when supported, each with a fresh context and the same brief. Ask each for findings with a location, the affected behavior or maintenance cost, and supporting evidence. Use the configured models at their usual effort for routine changes. For a risky migration, concurrency change, or cross-module redesign, request higher effort from both when the host allows it. Keep the reviews read-only. Wait for both without showing either reviewer the other's findings.
+Start one read-only subagent per model family, each in a fresh context with the same brief. When the host supports parallel runs, submit both launches in one batch or make two nonblocking launch calls before waiting for either result. Run them sequentially only when the host requires it. Collect both results without sharing either reviewer's findings with the other.
+
+Ask each for findings with a location, the affected behavior or maintenance cost, and supporting evidence. Use the configured models at their usual effort for routine changes. For a risky migration, concurrency change, or cross-module redesign, request higher effort from both when the host allows it.
 
 In Cursor, Copilot, and VS Code Local, delegate to the named subagents `review-openai` and `review-anthropic`.
 

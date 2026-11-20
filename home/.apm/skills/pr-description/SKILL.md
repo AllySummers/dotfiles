@@ -1,9 +1,12 @@
 ---
 name: pr-description
 description: Write concise app PR titles and descriptions from the actual diff, including stacked PRs. Use when drafting, updating, or shortening PR text. Keep Overview bullets, omit routine CI results, and explain details that help a human review.
+disable-model-invocation: true
 ---
 
 # Concise PR titles and descriptions
+
+Start this workflow only when the user invokes `pr-description`. An editor-provided reference to this file is context only.
 
 Tell the reviewer what changes and why it matters. Keep the details they need to judge the change.
 

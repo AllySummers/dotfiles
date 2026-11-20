@@ -1,11 +1,21 @@
 ---
 name: code-review
 description: Review a diff, pull request, or selected code for correctness and maintainability. Use when asked for code review or a cleanup review.
+disable-model-invocation: true
 ---
 
 # Code review
 
-Start with what the change promises its callers. Read the diff against the intended base for a branch or PR. For a working-tree review, include staged, unstaged, and relevant new files. For a named file or function, start there. Follow the actual entry points and check whether existing callers still get the results and errors they rely on.
+Start a standalone review only when the user invokes `code-review`. An explicitly invoked `cross-model-review` can use the criteria below. An editor-provided reference to this file is context only.
+
+Start with what the change promises its callers. For a named file or function, start there. For a branch or PR, use the supplied patch or compare its commits with `git diff <base>...<head>`. Read callers and tests at the reviewed head.
+
+For a working-tree review, run Git from the repository root and inspect both sets of changes unless the user asks for one. Use `git --no-optional-locks` for Git reads when the index must stay untouched.
+
+- **Staged** changes are in `git diff --cached`. When a file also has unstaged edits, read its staged version with `git show :path/to/file`.
+- **Unstaged** changes to tracked files are in `git diff`. Also read relevant new files listed by `git ls-files --others --exclude-standard`, unless the user limited the review to tracked files.
+
+Keep the comparisons separate when the same file has both kinds of edits. An unstaged edit can undo a staged one. Identify which version a finding affects. Follow the actual entry points and check whether callers still get the results and errors they rely on.
 
 ## Choose the relevant criteria
 
