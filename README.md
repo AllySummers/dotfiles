@@ -158,6 +158,8 @@ home/.vscode/extensions/cursor-dotfiles/ -> ~/.vscode/extensions/cursor-dotfiles
 
 Editor settings use mise JSONC merges (`merge = true`, `format = "jsonc"`). `templates/editors/settings.jsonc` holds shared settings and renders the platform-specific `mise.binPath`; `cursor.json` and `vscode.json` hold editor-specific overrides, including `update.mode` and `workbench.colorTheme`. VS Code stable and Insiders use the same overrides. Comments and keys outside these sources stay in each editor's file. Managed keys are restored on apply; removing a key from a source leaves its existing value in the editor's file.
 
+[VS Code approvals](https://code.visualstudio.com/docs/agents/run/approvals): [the VS Code template](templates/editors/vscode.json) guides Copilot's **Assisted** reviewer and adds terminal and documentation URL rules alongside VS Code's defaults. To persist a grant for one MCP tool, use **Chat: Manage Tool Approval** and select the individual tool, not its server. `chat.tools.eligibleForAutoApproval` controls eligibility; it does not grant approval. These settings do not change Codex or Claude's permission modes.
+
 Editor merge entries live in `home/.config/mise/config.<os>.toml`, loaded through `auto_env`:
 
 | Platform | Settings directory (`<editor>/User/settings.json`) |

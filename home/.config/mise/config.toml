@@ -126,6 +126,7 @@ tombi = "latest"
 entire = "0.13.4"
 qsv = "29.0.0"
 jactionlint = "latest"
+"github:github/copilot-cli" = "latest"
 
 # [tools."pipx:git+https://github.com/openai/privacy-filter.git"]
 # version = "f7f00ca7fb869683eb732c010299d901457f19c3"

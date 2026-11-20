@@ -1,5 +1,35 @@
 {
+  "chat.permissions.assisted.instructions": "For the task I requested, approve workspace searches, Git and stack inspection, GitHub PR/issue reads, Context7 public documentation lookups, and fetches from approved documentation sites. Approve mise task/tool discovery and the home agent:disclosure-info task. In trusted workspaces, approve local tests, lint and typechecks when the underlying task only performs those checks. Ask before installs, arbitrary scripts, destructive changes, commits, pushes, publishing, external writes, or sending private data to a new destination. A request to review or draft is not permission to post.",
+  "chat.tools.terminal.autoApprove": {
+    "/^mise -C ~ run agent:disclosure-info$/": true,
+    "/^mise (?:-C ~ )?(?:tasks(?: ls)?(?: --(?:json|name-only|global|all))*|config ls|(?:dot|dotfiles) status)$/": true,
+    "/^mise (?:-C ~ )?tasks info (?:--json )?[A-Za-z0-9_][A-Za-z0-9_:.-]*$/": true,
+    "/^mise (?:ls|current|which)(?: [A-Za-z0-9_][A-Za-z0-9_.-]*)?$/": true,
+    "/^gh issue view [0-9]+(?: --comments| --json [A-Za-z,]+)?$/": true,
+    "/^gh pr view(?: [0-9]+)?(?: --comments| --json [A-Za-z,]+)?$/": true,
+    "/^gh pr diff(?: [0-9]+)?(?: --name-only)?$/": true,
+    "/^gh pr checks(?: [0-9]+)?(?: --required)?$/": true,
+    "/^gh stack view(?: --(?:short|json))?$/": true,
+    "/^gt (?:ls|log(?: short)?)(?: -(?:a|r|s|u)| --(?:all|reverse|stack|show-untracked|no-interactive)| (?:-n|--steps) [0-9]+)*$/": true,
+    "/^gt (?:ll|log long|parent|children|trunk(?: -a| --all)?)(?: --no-interactive)?$/": true,
+    "/^gt info(?: [A-Za-z0-9_][A-Za-z0-9_./-]*)?(?: -(?:b|d|p|s)| --(?:body|diff|patch|stat|no-interactive))*$/": true,
+    "/^git worktree list(?: --porcelain)?$/": true,
+    "/^git rev-parse (?:HEAD|--short HEAD|--abbrev-ref HEAD|--show-toplevel|--git-dir|--git-common-dir|--is-inside-work-tree)$/": true,
+    "/^git merge-base(?: --is-ancestor)?(?: [A-Za-z0-9_][A-Za-z0-9_./~^@{}-]*){2}$/": true
+  },
+  "chat.tools.urls.autoApprove": {
+    "https://mise.jdx.dev": true,
+    "https://hk.jdx.dev": true,
+    "https://usage.jdx.dev": true,
+    "https://pitchfork.jdx.dev": true,
+    "https://microsoft.github.io/apm/*": true,
+    "https://docs.atuin.sh": true,
+    "https://cli.github.com/manual/*": true,
+    "https://docs.github.com": true
+  },
   "update.mode": "default",
   "workbench.colorTheme": "Cursor (Dotfiles)",
-  "workbench.editor.useModal": "off"
+  "workbench.editor.useModal": "off",
+  "chat.editor.workingSet.enabled": false,
+  "chat.editing.autoAcceptDelay": 1
 }
