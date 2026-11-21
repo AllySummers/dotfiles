@@ -12,9 +12,7 @@ mise dotfiles apply \
   "$HOME/.cursor/hooks.json" \
   "$HOME/.copilot/hooks/ai-disclosure.json"
 
-for agent in claude-code codex copilot; do
-  atuin hook install "$agent"
-done
+atuin setup --only --no-import --agent-history --agents claude-code,codex,copilot
 
 # Append the disclosure handler without replacing Atuin or user hook arrays.
 # SessionStart in the source only carries the rendered command, and the script

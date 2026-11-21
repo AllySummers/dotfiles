@@ -82,8 +82,8 @@ The canonical APM disclosure instruction uses `tool-version`. The normal
 
 ### Atuin recording and search
 
-The setup task uses upstream `atuin hook install` for Claude Code, Codex, and
-Copilot. Codex's installer also maintains its hook trust entries. Claude's
+The setup task uses upstream `atuin setup --only --agent-history` for Claude Code,
+Codex, and Copilot. Codex's installer also maintains its hook trust entries. Claude's
 disclosure `PostToolUse` hook is appended alongside existing hooks, preserving Atuin
 and user handlers instead of replacing their arrays.
 

@@ -82,7 +82,7 @@ usage = "latest"
 
 # languages & runtimes
 node = "26"
-"aqua:npm/cli" = "12.2.2"
+"aqua:npm/cli" = "12.2.3"
 pnpm = "latest"
 deno = "latest"
 # bun = "latest"
