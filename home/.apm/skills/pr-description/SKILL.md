@@ -42,7 +42,7 @@ Name the affected behavior with a short active phrase: `Keep clause suggestions 
 
 Use a flat `-` bullet list in the template’s overview or summary section, keeping its heading. When no template specifies that section, use `## Overview`. Do not add a duplicate Overview beside the template’s Summary. An optional one- or two-sentence introduction can explain the problem before the bullets. Omit it when the bullets already supply the context.
 
-Usually two to five short bullets suffice; one is fine for a small fix. Explain the trigger and outcome. Keep permissions, destructive effects, and surprising choices. Omit endpoint paths, helper names, field inventories, cache mechanics, and routine loading states unless their exact form matters to review. Let useful information set the length, not a bullet quota.
+Explain what changes and why the approach fits the problem. Include concrete implementation details when they explain a design choice, show how the change meets a requirement, or help the reviewer see what to verify. Give each distinct point enough room to make sense.
 
 Beyond the template’s required sections, add sections such as `Screenshots`, `Rollout`, or `Performance` only when they make important information easier to find. Keep relevant permission and data boundaries, breaking changes, migrations or backfills, deploy order, feature flags, accepted tradeoffs, and known limitations. Avoid unsupported claims that a change is safe or low risk. State each caveat once, beside its claim.
 
@@ -120,7 +120,7 @@ Remove file tours, function-call narration, development history, rejected experi
 
 Do not hard-wrap PR prose: GitHub renders single line breaks. Keep each paragraph and bullet on one source line; retain deliberate Markdown breaks and code formatting. Wrap `@names` in backticks unless intentionally pinging someone.
 
-Read the finished draft against the repository template, diff, and checked sources. Restore any missing required template sections before saving. For each sentence, ask what it helps the reviewer understand or decide. Cut mechanism before cutting a consequential condition. Correct unsupported claims; do not turn possible bugs into settled design decisions.
+Read the finished draft against the repository template, diff, and checked sources. Restore any missing required template sections before saving. For each sentence, ask what it helps the reviewer understand or decide. If you remove this detail, can the reviewer still tell why the change works, what it depends on, and where its limits are? Correct unsupported claims; do not turn possible bugs into settled design decisions.
 
 ## Hand it back
 
