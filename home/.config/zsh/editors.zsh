@@ -9,7 +9,7 @@ _vscode_env="${VSCODE_GIT_ASKPASS_MAIN:-}${GIT_ASKPASS:-}${VSCODE_CWD:-}"
 if [[ "${TERM_PROGRAM:l}" == cursor || "$_vscode_env" == *[Cc]ursor* ]]; then
   export VISUAL=cursor
 elif [[ "${TERM_PROGRAM:l}" == vscode || "$_vscode_env" == *vscode-server* ]]; then
-  if [[ "$_vscode_env" == *insiders* ]]; then
+  if [[ "${TERM_PROGRAM_VERSION:-}" == *-insider || "$_vscode_env" == *insiders* ]]; then
     export VISUAL=code-insiders
   else
     export VISUAL=code
