@@ -112,7 +112,7 @@ difftastic = "latest"
 
 # dev tools
 gh = "latest"
-"github:microsoft/apm" = "0.37.0"
+"github:microsoft/apm" = "0.38.1"
 pitchfork = "latest"
 graphite = "latest"
 jd = "latest"
@@ -133,12 +133,12 @@ jactionlint = "latest"
 # python = "3.14"
 
 [tools."npm:ctx7"]
-version = "latest"
+version = "0.13.0"
 lazy = true
 lazy_bins = ["ctx7"]
 
 [tools."http:blacksmith"]
-version = "0.5.3"
+version = "0.7.12"
 url = 'https://clireleases.blacksmith.sh/cli/v{{ version }}/{{ os(macos="darwin") }}/{{ arch(x64="amd64") }}/blacksmith'
 checksum_url = 'https://clireleases.blacksmith.sh/cli/v{{ version }}/{{ os(macos="darwin") }}/{{ arch(x64="amd64") }}/blacksmith.sha256'
 checksum_expr = '"sha256:" + split(trim(body), " ")[0]'
@@ -283,7 +283,7 @@ run = [
   "mise run dotfiles:apm:setup{% if usage.force %} --force{% endif %}",
   { task = "dotfiles:agent:hooks" },
   { task = "agent:atuin-setup:mcp" },
-  "ctx7 setup --claude --cursor --vscode --copilot --codex --mcp --yes"
+  "ctx7 setup --claude --cursor --vscode --vscode-insiders --copilot --codex --mcp --yes"
 ]
 
 [tasks."git:remotes"]
