@@ -1,6 +1,6 @@
 ---
 name: capture-ui
-description: Capture screenshots, before-and-after comparisons, or short recordings of real UI changes on a local dev server. Prefer Playwright. Use for local demos, bug fixes, and PR media.
+description: Capture screenshots, before-and-after comparisons, or short recordings of real UI changes on a local dev server. Use headless Playwright for local demos, bug fixes, and PR media.
 ---
 
 # Capture UI changes
@@ -19,14 +19,18 @@ description: Capture screenshots, before-and-after comparisons, or short recordi
 
 ## Capture with Playwright
 
-- Prefer the repo's installed Playwright, browser fixtures, and test login. Use a temporary script or an existing browser flow for interactions. For a simple page capture, the Playwright screenshot CLI is enough if the page is ready without extra actions. If Playwright is unavailable, use another available browser tool against the same dev server.
+- Use headless Playwright for all browser interaction and capture. Never open Chrome or another browser interactively or use browser-use or computer-use tools. If Playwright cannot run, report the blocker.
+- Use the repo's Playwright, browser fixtures, and test login when available. For a simple page that is ready without extra actions, use the Playwright screenshot CLI. Use a temporary Playwright script or an existing Playwright flow for interactions. Use the [recording recipe](references/recording.md) for motion and standalone Playwright setup.
 - Match the viewport, device settings, theme, role, fixtures, and interaction state across a comparison. Use role- or label-based locators and wait for the data or UI you intend to show. For stills, save PNG with `page.screenshot()` or `locator.screenshot()`. Use `animations: 'disabled'` if movement makes the frame unstable. Frame the UI with enough context to make the change clear.
 - Aim for 2560×1440 on full-viewport desktop captures and keep at least 1920×1080 when feasible. Preserve the intended layout for responsive and component shots. For PNGs, use a higher device scale factor when you need more pixels at the same CSS viewport.
-- For motion, use [the Playwright recording recipe](references/recording.md).
-- Save deliverables in the requested artifact location or a scratch directory outside tracked source. Open the screenshots and inspect the recording for legibility, the intended state or interaction, and accidental exposure of real data, credentials, or tokens. Stop any dev servers started solely for the capture when finished.
+- Save deliverables in the requested artifact location or a scratch directory outside tracked source. Inspect the saved media locally for legibility, the intended state or interaction, and accidental exposure of real data, credentials, or tokens. Stop any dev servers started solely for the capture when finished.
 
 ## Hand back the media
 
 Return the files with short captions explaining what to notice. For a comparison, label them Before and After and identify the revisions. Mention any mocks or setup differences that affect interpretation.
 
-When working with `pr-description`, hand over the files and captions for its media section. Capture alone authorizes local files. Upload or attach them only when the user's request authorizes it, using the available publishing workflow.
+When working with `pr-description`, hand over the files and captions for its media section. Upload only when the user's request authorizes it.
+
+Use the GitHub CLI for GitHub uploads. Run `gh pr create --attach <file>` or `gh pr edit <pr> --attach <file>` for PRs, repeating `--attach` for each file. Preserve the existing PR body when adding media. To place media in the intended section, use `--body-file` with local Markdown references to the attached files. GitHub CLI rewrites the references to uploaded URLs. Put a video reference such as `![](./demo.mp4)` on its own line so it renders as a player. [GitHub CLI attachment docs](https://docs.github.com/en/github-cli/github-cli/attaching-files-with-github-cli)
+
+Read back the saved PR body with `gh pr view <pr> --json body`. If an upload fails, read back the body before retrying because some attachments may already be saved. If `gh` cannot attach the media, return the local files and report the blocker.
